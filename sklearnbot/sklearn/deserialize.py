@@ -34,7 +34,7 @@ def deserialize(configuration_space: ConfigSpace.ConfigurationSpace,
         The instantiated classifier with default hyperparameters
     """
     numeric_transformer = sklearn.pipeline.make_pipeline(
-        sklearn.impute.MissingIndicator(),
+        sklearn.impute.MissingIndicator(error_on_new=False),
         sklearn.preprocessing.Imputer(),
         sklearn.preprocessing.StandardScaler())
 

@@ -30,6 +30,19 @@ def get_random_configuration(configuration_space: ConfigSpace.ConfigurationSpace
     return param_grid
 
 
+def get_available_config_spaces():
+    """
+    Returns a list of all available configuration spaces. To be used in
+    example scripts, to determine which classifiers this can be ran with. 
+
+    Returns
+    -------
+    config_spaces : list[str]
+        A list of all available configuration spaces.
+    """
+    return ['decision_tree']
+
+
 def get_config_space(classifier: sklearn.base.BaseEstimator, seed: typing.Optional[int]) \
         -> ConfigSpace.ConfigurationSpace:
     """

@@ -1,3 +1,5 @@
 ConfigSpace
-openml==0.7.0
-sklearn==0.20.0
+pandas
+openml
+git+https://github.com/openml/openml-python-contrib.git
+sklearn>=0.20.0

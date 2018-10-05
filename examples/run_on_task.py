@@ -6,6 +6,7 @@ import sklearnbot
 
 # sshfs fr_jv1031@login1.nemo.uni-freiburg.de:/home/fr/fr_fr/fr_jv1031/experiments ~/nemo_experiments
 def parse_args():
+    all_classifiers = sklearnbot.config_spaces.get_available_config_spaces()
     parser = argparse.ArgumentParser(description='Generate data for openml-pimp project')
     all_classifiers = ['decision_tree']
     parser.add_argument('--n_executions', type=int,  default=1000, help='number of runs to be executed. ')
@@ -18,7 +19,7 @@ def parse_args():
     parser.add_argument('--output_dir', type=str, default=default_output_dir,
                         help='Location to store finished runs')
     parser.add_argument('--upload_result', action='store_true',
-                        help='if true, results will be immediatelly uploaded to OpenML.'
+                        help='if true, results will be immediately uploaded to OpenML.'
                              'Otherwise they will be stored on disk. ')
 
     return parser.parse_args()
