@@ -4,10 +4,14 @@ import os
 import shutil
 import sklearnbot
 import traceback
+import typing
 import uuid
 
 
-def run_bot_on_task(task_id: int, configuration_space: ConfigSpace.ConfigurationSpace, output_dir: str, upload_and_delete: bool):
+def run_bot_on_task(task_id: int,
+                    configuration_space: ConfigSpace.ConfigurationSpace,
+                    output_dir: str,
+                    upload_and_delete: bool) -> typing.Tuple[bool, typing.Optional[int], typing.Optional[str]]:
     """
     Runs the bot with a random configuration on an OpenML task
 

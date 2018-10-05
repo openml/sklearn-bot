@@ -1,7 +1,20 @@
 import ConfigSpace
 
 
-def get_hyperparameter_search_space(seed):
+def get_hyperparameter_search_space(seed: int) -> ConfigSpace.ConfigurationSpace:
+    """
+    The decision tree configuration space as presented in auto-sklearn.
+
+    Parameters
+    ----------
+    seed: int
+        Random seed that will be used to sample random configurations
+
+    Returns
+    -------
+    cs: ConfigSpace.ConfigurationSpace
+        The configuration space object
+    """
     cs = ConfigSpace.ConfigurationSpace("sklearn.tree.DecisionTreeClassifier", seed)
     strategy = ConfigSpace.CategoricalHyperparameter(
         'strategy', ['mean', 'median'], default_value='median', meta={'component': 'columntransformer__numeric__imputer'})
