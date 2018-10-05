@@ -14,8 +14,10 @@ def deserialize(configuration_space: ConfigSpace.ConfigurationSpace,
         sklearn.preprocessing.Imputer(),
         sklearn.preprocessing.StandardScaler())
 
+    # note that the dataset is encoded numerically, hence we can only impute
+    # numeric values, even for the categorical columns. 
     categorical_transformer = sklearn.pipeline.make_pipeline(
-        sklearn.impute.SimpleImputer(strategy='constant', fill_value='missing'),
+        sklearn.impute.SimpleImputer(strategy='constant', fill_value=-1),
         sklearn.preprocessing.OneHotEncoder(handle_unknown='ignore'))
 
     transformer = sklearn.compose.ColumnTransformer(
