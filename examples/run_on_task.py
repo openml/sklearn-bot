@@ -40,7 +40,7 @@ def run():
         success, run_id, folder = sklearnbot.bot.run_bot_on_task(args.task_id,
                                                                  configuration_space,
                                                                  output_dir,
-                                                                 args.upload_and_delete)
+                                                                 args.upload_result)
         if success:
             print(sklearnbot.utils.get_time(), 'Run was executed successfully. Run id=%s; folder=%s' % (run_id, folder))
         else:
