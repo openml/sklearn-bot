@@ -1,1 +1,1 @@
-from .run import run_on_random_task
+from .run import run_bot_on_task

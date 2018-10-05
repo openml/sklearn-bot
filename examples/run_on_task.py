@@ -30,10 +30,14 @@ def run():
         openml.config.server = 'https://test.openml.org/api/v1/'
 
     configuration_space = sklearnbot.config_spaces.get_config_space(args.classifier_name, None)
+    output_dir = os.path.join(args.output_dir, args.classifier_name)
 
     for i in range(args.n_executions):
-        sklearnbot.bot.run_on_random_task([args.task_id], configuration_space,
-                                          os.path.join(args.output_dir, args.classifier_name))
+        success, run_id, folder = sklearnbot.bot.run_bot_on_task(args.task_id, configuration_space, output_dir)
+        if success:
+            print(sklearnbot.utils.get_time(), 'Run was executed successfully. Run id=%s; folder=%s' % (run_id, folder))
+        else:
+            print(sklearnbot.utils.get_time(), 'A problem occurred. Run id=%s; folder=%s' % (run_id, folder))
 
 
 if __name__ == '__main__':

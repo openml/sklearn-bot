@@ -2,6 +2,7 @@ import argparse
 import openml
 import os
 import sklearnbot
+import random
 
 
 # sshfs fr_jv1031@login1.nemo.uni-freiburg.de:/home/fr/fr_fr/fr_jv1031/experiments ~/nemo_experiments
@@ -31,11 +32,15 @@ def run():
     tasks = openml.study.get_study(args.study_id, 'tasks').tasks
 
     configuration_space = sklearnbot.config_spaces.get_config_space(args.classifier_name, None)
+    output_dir = os.path.join(args.output_dir, args.classifier_name)
 
     for i in range(args.n_executions):
-        # get task and print meta-data
-        sklearnbot.bot.run_on_random_task(tasks, configuration_space,
-                                          os.path.join(args.output_dir, args.classifier_name))
+        task_id = random.choice(tasks)
+        success, run_id, folder = sklearnbot.bot.run_bot_on_task(task_id, configuration_space, output_dir)
+        if success:
+            print(sklearnbot.utils.get_time(), 'Run was executed successfully. Run id=%s; folder=%s' % (run_id, folder))
+        else:
+            print(sklearnbot.utils.get_time(), 'A problem occurred. Run id=%s; folder=%s' % (run_id, folder))
 
 
 if __name__ == '__main__':
