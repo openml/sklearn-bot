@@ -15,7 +15,7 @@ def parse_args():
     parser.add_argument('--study_id', type=str, default=14, help='the tag to obtain the tasks from')
     parser.add_argument('--openml_server', type=str, default=None, help='the openml server location')
     parser.add_argument('--openml_apikey', type=str, default=None, help='the apikey to authenticate to OpenML')
-    parser.add_argument('--classifier', type=str, choices=all_classifiers, default='decision_tree',
+    parser.add_argument('--classifier_name', type=str, choices=all_classifiers, default='decision_tree',
                         help='the classifier to run')
     default_output_dir = os.path.join(os.path.expanduser('~'), 'experiments/sklearnbot')
     parser.add_argument('--output_dir', type=str, default=default_output_dir,
@@ -33,11 +33,12 @@ def run():
         openml.config.server = 'https://test.openml.org/api/v1/'
     tasks = openml.study.get_study(args.study_id, 'tasks').tasks
 
-    configuration_space = sklearnbot.config_spaces.get_config_space(args.classifier, None)
+    configuration_space = sklearnbot.config_spaces.get_config_space(args.classifier_name, None)
 
     for i in range(args.n_executions):
         # get task and print meta-data
-        sklearnbot.bot.run_on_random_task(tasks, configuration_space, args.output_dir)
+        sklearnbot.bot.run_on_random_task(tasks, configuration_space,
+                                          os.path.join(args.output_dir, args.classifier_name))
 
 
 if __name__ == '__main__':

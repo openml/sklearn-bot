@@ -17,13 +17,20 @@ def get_hyperparameter_search_space(seed):
         'min_weight_fraction_leaf', 0.0, meta={'component': 'decisiontreeclassifier'})
     max_features = ConfigSpace.UnParametrizedHyperparameter(
         'max_features', 1.0, meta={'component': 'decisiontreeclassifier'})
-    max_leaf_nodes = ConfigSpace.UnParametrizedHyperparameter(
-        'max_leaf_nodes', 'None', meta={'component': 'decisiontreeclassifier'})
+    # max_leaf_nodes = ConfigSpace.UnParametrizedHyperparameter(
+    #     'max_leaf_nodes', None, meta={'component': 'decisiontreeclassifier'})
     min_impurity_decrease = ConfigSpace.UnParametrizedHyperparameter(
         'min_impurity_decrease', 0.0, meta={'component': 'decisiontreeclassifier'})
+    # TODO: max_leaf_nodes one can only be tuned once config space allows for this.
 
-    cs.add_hyperparameters([strategy, criterion, max_features, max_depth,
-                            min_samples_split, min_samples_leaf,
-                            min_weight_fraction_leaf, max_leaf_nodes,
-                            min_impurity_decrease])
+    cs.add_hyperparameters([strategy,
+                            criterion,
+                            max_features,
+                            max_depth,
+                            min_samples_split,
+                            min_samples_leaf,
+                            min_weight_fraction_leaf,
+                            # max_leaf_nodes,
+                            min_impurity_decrease,
+                            ])
     return cs

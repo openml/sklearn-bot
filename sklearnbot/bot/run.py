@@ -23,7 +23,7 @@ def run_on_random_task(tasks: typing.List, configuration_space: ConfigSpace, out
 
         # invoke OpenML run
         run = openml.runs.run_model_on_task(task, classifier)
-        run.to_filesystem(os.path.join(output_dir, classifier,
-                                       str(task_id), str(uuid.uuid4())), store_model=False)
+        run.to_filesystem(os.path.join(output_dir, str(task_id), str(uuid.uuid4())),
+                          store_model=False)
     except openml.exceptions.OpenMLServerException:
         traceback.print_exc()
