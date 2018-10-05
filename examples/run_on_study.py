@@ -18,6 +18,10 @@ def parse_args():
     default_output_dir = os.path.join(os.path.expanduser('~'), 'experiments/sklearnbot')
     parser.add_argument('--output_dir', type=str, default=default_output_dir,
                         help='Location to store finished runs')
+    parser.add_argument('--upload_result', action='store_true',
+                        help='if true, results will be immediatelly uploaded to OpenML.'
+                             'Otherwise they will be stored on disk. ')
+
     return parser.parse_args()
 
 
@@ -36,7 +40,10 @@ def run():
 
     for i in range(args.n_executions):
         task_id = random.choice(tasks)
-        success, run_id, folder = sklearnbot.bot.run_bot_on_task(task_id, configuration_space, output_dir)
+        success, run_id, folder = sklearnbot.bot.run_bot_on_task(task_id,
+                                                                 configuration_space,
+                                                                 output_dir,
+                                                                 args.upload_result)
         if success:
             print(sklearnbot.utils.get_time(), 'Run was executed successfully. Run id=%s; folder=%s' % (run_id, folder))
         else:
