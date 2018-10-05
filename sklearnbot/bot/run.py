@@ -11,7 +11,8 @@ import uuid
 def run_bot_on_task(task_id: int,
                     configuration_space: ConfigSpace.ConfigurationSpace,
                     output_dir: str,
-                    upload_and_delete: bool) -> typing.Tuple[bool, typing.Optional[int], typing.Optional[str]]:
+                    upload_and_delete: bool) \
+        -> typing.Tuple[bool, typing.Optional[int], typing.Optional[str]]:
     """
     Runs the bot with a random configuration on an OpenML task
 
@@ -47,14 +48,21 @@ def run_bot_on_task(task_id: int,
     """
     local_run_dir = None
     try:
+        # obtain task
         task = openml.tasks.get_task(task_id)
         data_name = task.get_dataset().name
         data_qualities = task.get_dataset().qualities
         data_tuple = (task.task_id, data_name, data_qualities['NumberOfFeatures'], data_qualities['NumberOfInstances'])
         print(sklearnbot.utils.get_time(), "Obtained task %d (%s); %s attributes; %s observations" % data_tuple)
+
+        # obtain deserialized classifier
         nominal_indices = task.get_dataset().get_features_by_type('nominal', [task.target_name])
         numeric_indices = task.get_dataset().get_features_by_type('numeric', [task.target_name])
         classifier = sklearnbot.sklearn.deserialize(configuration_space, numeric_indices, nominal_indices)
+
+        # sample configuration and set hyperparameters
+        configuration_dict = sklearnbot.config_spaces.get_random_configuration(configuration_space)
+        classifier.set_params(**configuration_dict)
         print(sklearnbot.utils.get_time(), classifier)
 
         # invoke OpenML run
