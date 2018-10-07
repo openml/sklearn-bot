@@ -45,7 +45,7 @@ To run the sklearn-bot on a a benchmark suite from OpenML, please use the
 following command:
 
 ```
-python examples/run_on_task.py --study_id OpenML100 --openml_server https://www.openml.org/api/v1/ --openml_apikey abcdef --classifier_name decision_tree --upload_result
+python examples/run_on_study.py --study_id OpenML100 --openml_server https://www.openml.org/api/v1/ --openml_apikey abcdef --classifier_name decision_tree --upload_result
 ```
 
 This function has the same command line options as `run_on_task`, except for the
