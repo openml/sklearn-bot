@@ -17,7 +17,7 @@ command:
 python examples/run_on_task.py --task_id 5 --openml_server https://www.openml.org/api/v1/ --openml_apikey abcdef --classifier_name decision_tree --upload_result
 ```
 
-Note the following command line options: 
+The following command line options are accepted: 
 * `n_executions`: By default, the sklearn-bot will execute 1000 runs and 
 terminate after these. Using this option this behavior can be overridden to any
 other number of runs. 
@@ -63,6 +63,32 @@ results from other people that ran the sklearn-bot, or happened to run a
 scikit-learn classifier with hyperparameter settings that also fell within the
 search range. 
 
+To obtain results from the sklearn-bot that were uploaded to OpenML (using the
+`--upload_result` flag), please use the following command:
+
+```
+python examples/obtain_results.py --study_id OpenML100 --openml_server https://www.openml.org/api/v1/ --scoring predictive_accuracy --classifier_name decision_tree
+```
+
+The following command line options are accepted: 
+* `output_directory`: This is where the results will be placed as ARFF file. 
+Also cache files will be stored here, that allow for fast regeneration of the
+datasets.
+* `num_runs`: The number of runs per task that will be obtained. Setting this to
+a number lower than the actual available runs will allow for efficient caching.
+* `study_id`: Refers to the benchmark suite (which tasks will be included)
+* `scoring`: The performance measure to download. Defaults to 
+`predictive_accuracy`, but for example `area_under_roc_curve`, `f_measure` and 
+`precision` are also sensible options. 
+* `normalize` (flag): If set, all performance results will be normalized to the
+interval [0, 1] per task. 
+* `openml_server`: The server from which the results should be downloaded. Make
+sure this is the same as the server to which the results where uploaded.
+* `classifier_name`: The classifier from which the results should be downloaded.
+Make sure that this is the same as the classifier with which the bot was ran. 
+
+Note that there is no need to provide an API key, as the OpenML server is only
+used for read operations. 
 
 ## Feature Requests
 

@@ -12,9 +12,7 @@ import sklearn
 def parse_args():
     all_classifiers = sklearnbot.config_spaces.get_available_config_spaces()
     parser = argparse.ArgumentParser(description='Generate data for openml-pimp project')
-    parser.add_argument('--cache_directory', type=str, default=os.path.expanduser('~') + '/experiments/sklearn-bot/cache',
-                        help='directory to store cache. Please delete this regularly, to obtain the latest results')
-    parser.add_argument('--output_directory', type=str, default=os.path.expanduser('~') + '/experiments/sklearn-bot/results',
+    parser.add_argument('--output_directory', type=str, default=os.path.expanduser('~') + '/experiments/sklearn-bot',
                         help='directory to store output')
     parser.add_argument('--num_runs', type=int, default=500, help='max results per task to obtain, to limit time')
     parser.add_argument('--study_id', type=str, default=14, help='the tag to obtain the tasks from')
@@ -48,13 +46,10 @@ def run():
     if flow_id is False:
         raise ValueError('Flow not recognized, this means that it does not exist on the OpenML server yet.')
 
-    relevant_tasks = study.tasks
-    # if args.num_tasks:
-    relevant_tasks = study.tasks[:5]
-
-    for task_id in relevant_tasks:
+    for task_id in study.tasks:
         print(sklearnbot.utils.get_time(), 'Currently processing task', task_id)
         try:
+            cache_directory = os.path.join(args.output_directory, 'cache')
             setup_data = openmlcontrib.meta.get_task_flow_results_as_dataframe(task_id=task_id,
                                                                                flow_id=flow_id,
                                                                                num_runs=args.num_runs,
@@ -62,7 +57,7 @@ def run():
                                                                                configuration_space=config_space,
                                                                                parameter_field='name',
                                                                                evaluation_measure=args.scoring,
-                                                                               cache_directory=args.cache_directory)
+                                                                               cache_directory=cache_directory)
         except ValueError as e:
             print('Problem in task %d:' % task_id, e)
             continue
@@ -80,16 +75,17 @@ def run():
     # if len(setup_data_all) < args.num_runs * len(relevant_tasks) * 0.25:
     #     raise ValueError('Num results suspiciously low. Please check.')
 
-    os.makedirs(args.output_directory, exist_ok=True)
+    output_directory = os.path.join(args.output_directory, 'results')
+    os.makedirs(output_directory, exist_ok=True)
     # create the task / parameters / performance arff
-    filename = os.path.join(args.output_directory, 'results_%s.arff' % args.classifier_name)
+    filename = os.path.join(output_directory, 'results_%s.arff' % args.classifier_name)
     relation_name = 'openml-meta-flow-%d' % flow_id
     json_meta = {'flow_id': flow_id,
                  'openml_server': openml.config.server,
                  'measure': args.scoring,
                  'normalized_y': args.normalize,
                  'study_id': args.study_id,
-                 'num_runs': args.num_runs}
+                 'max_runs_per_task': args.num_runs}
     with open(filename, 'w') as fp:
         arff.dump(openmlcontrib.meta.dataframe_to_arff(setup_data_all,
                                                        relation_name,

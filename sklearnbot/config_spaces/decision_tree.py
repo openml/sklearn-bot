@@ -17,23 +17,23 @@ def get_hyperparameter_search_space(seed: int) -> ConfigSpace.ConfigurationSpace
     """
     cs = ConfigSpace.ConfigurationSpace("sklearn.tree.DecisionTreeClassifier", seed)
     strategy = ConfigSpace.CategoricalHyperparameter(
-        'strategy', ['mean', 'median'], default_value='median', meta={'component': 'columntransformer__numeric__imputer'})
+        'columntransformer__numeric__imputer__strategy', ['mean', 'median'], default_value='median')
     criterion = ConfigSpace.CategoricalHyperparameter(
-        'criterion', ['gini', 'entropy'], default_value='gini', meta={'component': 'decisiontreeclassifier'})
+        'decisiontreeclassifier__criterion', ['gini', 'entropy'], default_value='gini')
     max_depth = ConfigSpace.UniformFloatHyperparameter(
-        'max_depth', 0., 2., default_value=0.5, meta={'component': 'decisiontreeclassifier'})
+        'decisiontreeclassifier__max_depth', 0., 2., default_value=0.5)
     min_samples_split = ConfigSpace.UniformIntegerHyperparameter(
-        'min_samples_split', 2, 20, default_value=2, meta={'component': 'decisiontreeclassifier'})
+        'decisiontreeclassifier__min_samples_split', 2, 20, default_value=2)
     min_samples_leaf = ConfigSpace.UniformIntegerHyperparameter(
-        'min_samples_leaf', 1, 20, default_value=1, meta={'component': 'decisiontreeclassifier'})
+        'decisiontreeclassifier__min_samples_leaf', 1, 20, default_value=1)
     min_weight_fraction_leaf = ConfigSpace.Constant(
-        'min_weight_fraction_leaf', 0.0, meta={'component': 'decisiontreeclassifier'})
+        'decisiontreeclassifier__min_weight_fraction_leaf', 0.0)
     max_features = ConfigSpace.UnParametrizedHyperparameter(
-        'max_features', 1.0, meta={'component': 'decisiontreeclassifier'})
+        'decisiontreeclassifier__max_features', 1.0)
     # max_leaf_nodes = ConfigSpace.UnParametrizedHyperparameter(
     #     'max_leaf_nodes', None, meta={'component': 'decisiontreeclassifier'})
     min_impurity_decrease = ConfigSpace.UnParametrizedHyperparameter(
-        'min_impurity_decrease', 0.0, meta={'component': 'decisiontreeclassifier'})
+        'decisiontreeclassifier__min_impurity_decrease', 0.0)
     # TODO: max_leaf_nodes one can only be tuned once config space allows for this.
 
     cs.add_hyperparameters([strategy,
