@@ -2,6 +2,21 @@ import ConfigSpace
 
 
 def get_hyperparameter_search_space(seed):
+    """
+    The random forest configuration space based on the search space from
+    auto-sklearn:
+    https://github.com/automl/auto-sklearn/blob/master/autosklearn/pipeline/components/classification/random_forest.py
+
+    Parameters
+    ----------
+    seed: int
+        Random seed that will be used to sample random configurations
+
+    Returns
+    -------
+    cs: ConfigSpace.ConfigurationSpace
+        The configuration space object
+    """
     cs = ConfigSpace.ConfigurationSpace('sklearn.ensemble.RandomForestClassifier', seed)
     imputation = ConfigSpace.CategoricalHyperparameter(
         name='columntransformer__numeric__imputer__strategy', choices=['mean', 'median', 'most_frequent'])

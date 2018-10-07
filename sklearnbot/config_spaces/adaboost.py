@@ -3,6 +3,21 @@ from sklearn.tree import DecisionTreeClassifier
 
 
 def get_hyperparameter_search_space(seed):
+    """
+    The adaboost configuration space based on the search space from
+    auto-sklearn:
+    https://github.com/automl/auto-sklearn/blob/master/autosklearn/pipeline/components/classification/adaboost.py
+
+    Parameters
+    ----------
+    seed: int
+        Random seed that will be used to sample random configurations
+
+    Returns
+    -------
+    cs: ConfigSpace.ConfigurationSpace
+        The configuration space object
+    """
     cs = ConfigSpace.ConfigurationSpace('sklearn.ensemble.AdaBoostClassifier',
                                         seed,
                                         meta={"adaboostclassifier__base_estimator": DecisionTreeClassifier()})

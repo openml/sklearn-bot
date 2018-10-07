@@ -3,7 +3,9 @@ import ConfigSpace
 
 def get_hyperparameter_search_space(seed: int) -> ConfigSpace.ConfigurationSpace:
     """
-    The decision tree configuration space as presented in auto-sklearn.
+    The decision tree configuration space based on the search space from
+    auto-sklearn:
+    https://github.com/automl/auto-sklearn/blob/master/autosklearn/pipeline/components/classification/decision_tree.py
 
     Parameters
     ----------
@@ -17,19 +19,19 @@ def get_hyperparameter_search_space(seed: int) -> ConfigSpace.ConfigurationSpace
     """
     cs = ConfigSpace.ConfigurationSpace("sklearn.tree.DecisionTreeClassifier", seed)
     strategy = ConfigSpace.CategoricalHyperparameter(
-        'columntransformer__numeric__imputer__strategy', ['mean', 'median'], default_value='median')
+        name='columntransformer__numeric__imputer__strategy', choices=['mean', 'median', 'most_frequent'], default_value='median')
     criterion = ConfigSpace.CategoricalHyperparameter(
-        'decisiontreeclassifier__criterion', ['gini', 'entropy'], default_value='gini')
+        name='decisiontreeclassifier__criterion', choices=['gini', 'entropy'], default_value='gini')
     max_depth = ConfigSpace.UniformFloatHyperparameter(
-        'decisiontreeclassifier__max_depth', 0., 2., default_value=0.5)
+        name='decisiontreeclassifier__max_depth', lower=0., upper=2., default_value=0.5)
     min_samples_split = ConfigSpace.UniformIntegerHyperparameter(
-        'decisiontreeclassifier__min_samples_split', 2, 20, default_value=2)
+        name='decisiontreeclassifier__min_samples_split', lower=2, upper=20, default_value=2)
     min_samples_leaf = ConfigSpace.UniformIntegerHyperparameter(
-        'decisiontreeclassifier__min_samples_leaf', 1, 20, default_value=1)
+        name='decisiontreeclassifier__min_samples_leaf', lower=1, upper=20, default_value=1)
     min_weight_fraction_leaf = ConfigSpace.Constant(
-        'decisiontreeclassifier__min_weight_fraction_leaf', 0.0)
+        name='decisiontreeclassifier__min_weight_fraction_leaf', value=0.0)
     max_features = ConfigSpace.UnParametrizedHyperparameter(
-        'decisiontreeclassifier__max_features', 1.0)
+        name='decisiontreeclassifier__max_features', value=1.0)
     # max_leaf_nodes = ConfigSpace.UnParametrizedHyperparameter(
     #     'max_leaf_nodes', None, meta={'component': 'decisiontreeclassifier'})
     min_impurity_decrease = ConfigSpace.UnParametrizedHyperparameter(
