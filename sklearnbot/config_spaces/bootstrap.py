@@ -4,32 +4,6 @@ import sklearnbot
 import typing
 
 
-def get_random_configuration(configuration_space: ConfigSpace.ConfigurationSpace) \
-        -> typing.Dict[str, typing.Union[int, float, str, None]]:
-    """
-    Samples a random configuration from the config space and corrects the names
-    to scikit-learn hyperparameters.
-
-    Parameters
-    ----------
-    configuration_space: ConfigSpace.ConfigurationSpace
-        The configuration space to sample from
-
-    Returns
-    -------
-    param_grid: dict[str, mixed]
-        A configuration, represented as a dict mapping from the hyperparameter
-        name to the hyperparameter value
-    """
-    original = configuration_space.sample_configuration(1).get_dictionary()
-    param_grid = dict()
-    for param_name, value in original.items():
-        hyperparameter = configuration_space.get_hyperparameter(param_name)
-        full_name = hyperparameter.meta['component'] + '__' + param_name
-        param_grid[full_name] = value
-    return param_grid
-
-
 def get_available_config_spaces():
     """
     Returns a list of all available configuration spaces. To be used in

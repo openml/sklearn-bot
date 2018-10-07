@@ -61,9 +61,9 @@ def run_bot_on_task(task_id: int,
         classifier = sklearnbot.sklearn.deserialize(configuration_space, numeric_indices, nominal_indices)
 
         # sample configuration and set hyperparameters
-        configuration_dict = sklearnbot.config_spaces.get_random_configuration(configuration_space)
-        classifier.set_params(**configuration_dict)
-        print(sklearnbot.utils.get_time(), classifier)
+        configuration_dict = configuration_space.sample_configuration(1)
+        print(sklearnbot.utils.get_time(), configuration_dict.get_dictionary())
+        classifier.set_params(**configuration_dict.get_dictionary())
 
         # invoke OpenML run
         run = openml.runs.run_model_on_task(task, classifier)
