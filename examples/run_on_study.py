@@ -13,7 +13,7 @@ def parse_args():
     parser.add_argument('--study_id', type=str, default=14, help='the tag to obtain the tasks from')
     parser.add_argument('--openml_server', type=str, default=None, help='the openml server location')
     parser.add_argument('--openml_apikey', type=str, default=None, help='the apikey to authenticate to OpenML')
-    parser.add_argument('--classifier_name', type=str, choices=all_classifiers, default='decision_tree',
+    parser.add_argument('--classifier_name', type=str, choices=all_classifiers, default='adaboost',
                         help='the classifier to run')
     default_output_dir = os.path.join(os.path.expanduser('~'), 'experiments/sklearn-bot')
     parser.add_argument('--output_dir', type=str, default=default_output_dir,

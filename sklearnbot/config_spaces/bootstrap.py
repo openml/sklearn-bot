@@ -14,17 +14,17 @@ def get_available_config_spaces():
     config_spaces : list[str]
         A list of all available configuration spaces.
     """
-    return ['decision_tree']
+    return ['adaboost', 'decision_tree', 'svc']
 
 
-def get_config_space(classifier: sklearn.base.BaseEstimator, seed: typing.Optional[int]) \
+def get_config_space(classifier_name: str, seed: typing.Optional[int]) \
         -> ConfigSpace.ConfigurationSpace:
     """
     Maps string names to a stored instantiation of the configuration space.
 
     Parameters
     ----------
-    classifier: str
+    classifier_name: str
         The string name of the config space
 
     seed: int or None
@@ -36,7 +36,6 @@ def get_config_space(classifier: sklearn.base.BaseEstimator, seed: typing.Option
     ConfigSpace.ConfigurationSpace
         An instantiation of the ConfigurationSpace
     """
-    if classifier == 'decision_tree':
-        return sklearnbot.config_spaces.decision_tree.get_hyperparameter_search_space(seed)
-    else:
-        raise ValueError()
+    if classifier_name not in get_available_config_spaces():
+        raise ValueError('Classifier search space not implemented: %s' % classifier_name)
+    return getattr(sklearnbot.config_spaces, classifier_name).get_hyperparameter_search_space(seed)

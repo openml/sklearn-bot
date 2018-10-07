@@ -55,4 +55,6 @@ def deserialize(configuration_space: ConfigSpace.ConfigurationSpace,
     model_class = getattr(importlib.import_module(module_name[0]),
                           module_name[1])
     clf = sklearn.pipeline.make_pipeline(transformer, model_class())
+    if configuration_space.meta is not None:
+        clf.set_params(**configuration_space.meta)
     return clf
