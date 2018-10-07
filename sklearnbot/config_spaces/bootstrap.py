@@ -1,5 +1,4 @@
 import ConfigSpace
-import sklearn
 import sklearnbot
 import typing
 
@@ -14,7 +13,7 @@ def get_available_config_spaces():
     config_spaces : list[str]
         A list of all available configuration spaces.
     """
-    return ['adaboost', 'decision_tree', 'svc']
+    return ['adaboost', 'decision_tree', 'random_forest', 'svc']
 
 
 def get_config_space(classifier_name: str, seed: typing.Optional[int]) \
