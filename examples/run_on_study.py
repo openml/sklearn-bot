@@ -15,11 +15,11 @@ def parse_args():
     parser.add_argument('--openml_apikey', type=str, default=None, help='the apikey to authenticate to OpenML')
     parser.add_argument('--classifier_name', type=str, choices=all_classifiers, default='decision_tree',
                         help='the classifier to run')
-    default_output_dir = os.path.join(os.path.expanduser('~'), 'experiments/sklearnbot')
+    default_output_dir = os.path.join(os.path.expanduser('~'), 'experiments/sklearn-bot')
     parser.add_argument('--output_dir', type=str, default=default_output_dir,
                         help='Location to store finished runs')
     parser.add_argument('--upload_result', action='store_true',
-                        help='if true, results will be immediatelly uploaded to OpenML.'
+                        help='if true, results will be immediately uploaded to OpenML.'
                              'Otherwise they will be stored on disk. ')
 
     return parser.parse_args()
