@@ -25,9 +25,9 @@ def get_hyperparameter_search_space(seed):
     # I will limit it to 1000 and put it on a logarithmic scale. (SF)
     # Please adjust that, if you know a proper range, this is just a guess.
     alpha = ConfigSpace.UniformFloatHyperparameter(
-        name='alpha', lower=1e-2, upper=100, default_value=1, log=True)
+        name='bernoullinb__alpha', lower=1e-2, upper=100, default_value=1, log=True)
     fit_prior = ConfigSpace.CategoricalHyperparameter(
-        name='fit_prior', choices=[True, False], default_value=True)
+        name='bernoullinb__fit_prior', choices=[True, False], default_value=True)
 
     cs.add_hyperparameters([
         imputation,

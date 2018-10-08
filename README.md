@@ -14,7 +14,7 @@ the results back from OpenML, once uploaded.
 To run the sklearn-bot on a single task from OpenML, please use the following
 command:
 ```
-python examples/run_on_task.py --task_id 5 --openml_server https://www.openml.org/api/v1/ --openml_apikey abcdef --classifier_name decision_tree --upload_result
+python examples/run_on_task.py --task_id 5 --openml_server https://www.openml.org/api/v1/ --openml_apikey abcdef --upload_result
 ```
 
 The following command line options are accepted: 
@@ -27,8 +27,9 @@ behavior is to upload results to the test server. By using this option, this
 behavior can be overridden
 * `openml_apikey`: API key to authenticate yourself with. Can be found on your
 OpenML profile. 
-* `classifier_name`: the classifier to run. Currently, `decision_tree` is the
-only legal option, but more will follow soon. 
+* `classifier_name`: the classifier to run. The default behavior is that a 
+random classifier will be selected. Select one of the list that is returned by
+`sklearnbot.config_spaces.get_available_config_spaces(False)`
 * `output_dir`: local directory where the results can be stored before
 uploading. 
 * `upload_result`: the default behavior of the sklearn-bot is to store the runs
@@ -45,7 +46,7 @@ To run the sklearn-bot on a a benchmark suite from OpenML, please use the
 following command:
 
 ```
-python examples/run_on_study.py --study_id OpenML100 --openml_server https://www.openml.org/api/v1/ --openml_apikey abcdef --classifier_name decision_tree --upload_result
+python examples/run_on_study.py --study_id OpenML100 --openml_server https://www.openml.org/api/v1/ --openml_apikey abcdef --upload_result
 ```
 
 This function has the same command line options as `run_on_task`, except for the
@@ -86,6 +87,8 @@ interval [0, 1] per task.
 sure this is the same as the server to which the results where uploaded.
 * `classifier_name`: The classifier from which the results should be downloaded.
 Make sure that this is the same as the classifier with which the bot was ran. 
+Note that the current functionality does not support the option to obtain the
+results from all classifiers at once yet. 
 
 Note that there is no need to provide an API key, as the OpenML server is only
 used for read operations. 
@@ -94,8 +97,6 @@ used for read operations.
 
 The following features will gradually be added to the sklearn-bot (contributors
 are welcome):
-* More classifiers. We want to extend the capabilities of the sklearn-bot to all 
-configuration spaces in auto-sklearn. 
 * Non-static pipelines. Although the current definition of a pipeline is fixed, 
 we aim to add the notion of non-static pipelines. This should be incorporated
 in a modular way. 

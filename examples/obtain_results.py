@@ -10,7 +10,7 @@ import sklearn
 
 
 def parse_args():
-    all_classifiers = sklearnbot.config_spaces.get_available_config_spaces()
+    all_classifiers = sklearnbot.config_spaces.get_available_config_spaces(False)
     parser = argparse.ArgumentParser(description='Generate data for openml-pimp project')
     parser.add_argument('--output_directory', type=str, default=os.path.expanduser('~') + '/experiments/sklearn-bot',
                         help='directory to store output')

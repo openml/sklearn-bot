@@ -7,7 +7,7 @@ import random
 
 # sshfs fr_jv1031@login1.nemo.uni-freiburg.de:/home/fr/fr_fr/fr_jv1031/experiments ~/nemo_experiments
 def parse_args():
-    all_classifiers = sklearnbot.config_spaces.get_available_config_spaces()
+    all_classifiers = sklearnbot.config_spaces.get_available_config_spaces(True)
     parser = argparse.ArgumentParser(description='Generate data for openml-pimp project')
     parser.add_argument('--n_executions', type=int,  default=1000, help='number of runs to be executed. ')
     parser.add_argument('--study_id', type=str, default=14, help='the tag to obtain the tasks from')
