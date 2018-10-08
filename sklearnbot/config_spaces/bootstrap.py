@@ -1,6 +1,10 @@
 import ConfigSpace
+import random
 import sklearnbot
 import typing
+
+
+ALL_WILDCARD_NAME = 'all'
 
 
 def get_available_config_spaces():
@@ -14,6 +18,7 @@ def get_available_config_spaces():
         A list of all available configuration spaces.
     """
     return [
+        ALL_WILDCARD_NAME,
         'adaboost',
         'bernoulli_nb',
         'decision_tree',
@@ -48,4 +53,6 @@ def get_config_space(classifier_name: str, seed: typing.Optional[int]) \
     """
     if classifier_name not in get_available_config_spaces():
         raise ValueError('Classifier search space not implemented: %s' % classifier_name)
+    while classifier_name == ALL_WILDCARD_NAME:
+        classifier_name = random.choice(get_available_config_spaces())
     return getattr(sklearnbot.config_spaces, classifier_name).get_hyperparameter_search_space(seed)

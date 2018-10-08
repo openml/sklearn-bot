@@ -33,7 +33,7 @@ def get_hyperparameter_search_space(seed):
         name='gradientboostingclassifier__criterion', choices=['friedman_mse', 'mse', 'mae'])
     min_samples_split = ConfigSpace.hyperparameters.UniformIntegerHyperparameter(
         name='gradientboostingclassifier__min_samples_split', lower=2, upper=20, default_value=2)
-    min_samples_leaf = ConfigSpace.hyperparameters.UniformFloatHyperparameter(
+    min_samples_leaf = ConfigSpace.hyperparameters.UniformIntegerHyperparameter(
         name='gradientboostingclassifier__min_samples_leaf', lower=1, upper=20, default_value=1)
     # TODO: upper bound?
     min_weight_fraction_leaf = ConfigSpace.hyperparameters.UniformFloatHyperparameter(
