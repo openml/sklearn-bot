@@ -21,8 +21,8 @@ def get_hyperparameter_search_space(seed):
 
     imputation = ConfigSpace.hyperparameters.CategoricalHyperparameter(
         name='columntransformer__numeric__imputer__strategy', choices=['mean', 'median', 'most_frequent'])
-    loss = ConfigSpace.hyperparameters.CategoricalHyperparameter(
-        name='gradientboostingclassifier__loss', choices=['deviance', 'exponential'])
+    # fixed to deviance, as exponential requires two classes
+    loss = ConfigSpace.hyperparameters.Constant(name='gradientboostingclassifier__loss', value='deviance')
     learning_rate = ConfigSpace.hyperparameters.UniformFloatHyperparameter(
         name='gradientboostingclassifier__learning_rate', lower=0.01, upper=2, default_value=0.1, log=True)
     n_estimators = ConfigSpace.hyperparameters.UniformIntegerHyperparameter(
@@ -31,13 +31,13 @@ def get_hyperparameter_search_space(seed):
         name='gradientboostingclassifier__subsample', lower=0.0, upper=1.0, default_value=1.0)
     criterion = ConfigSpace.hyperparameters.CategoricalHyperparameter(
         name='gradientboostingclassifier__criterion', choices=['friedman_mse', 'mse', 'mae'])
-    min_samples_split = ConfigSpace.hyperparameters.UniformFloatHyperparameter(
-        name='gradientboostingclassifier__min_samples_split', lower=0.0, upper=1.0, default_value=0.0, log=False)
+    min_samples_split = ConfigSpace.hyperparameters.UniformIntegerHyperparameter(
+        name='gradientboostingclassifier__min_samples_split', lower=2, upper=20, default_value=2)
     min_samples_leaf = ConfigSpace.hyperparameters.UniformFloatHyperparameter(
-        name='gradientboostingclassifier__min_samples_leaf', lower=0.0, upper=1.0, default_value=0.0, log=False)
+        name='gradientboostingclassifier__min_samples_leaf', lower=1, upper=20, default_value=1)
     # TODO: upper bound?
     min_weight_fraction_leaf = ConfigSpace.hyperparameters.UniformFloatHyperparameter(
-        name='gradientboostingclassifier__min_weight_fraction_leaf', lower=0.0, upper=1.0, default_value=0.0)
+        name='gradientboostingclassifier__min_weight_fraction_leaf', lower=0.0, upper=0.5, default_value=0.0)
     max_depth = ConfigSpace.hyperparameters.UniformIntegerHyperparameter(
         name='gradientboostingclassifier__max_depth', lower=1, upper=10, default_value=3)
     # TODO: upper bound?
