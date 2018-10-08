@@ -19,6 +19,7 @@ def get_available_config_spaces():
         'gradient_boosting',
         'neural_network',
         'random_forest',
+        'sgd',
         'svc'
     ]
 
