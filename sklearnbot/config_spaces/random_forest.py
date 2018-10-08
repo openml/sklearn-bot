@@ -20,6 +20,7 @@ def get_hyperparameter_search_space(seed):
     cs = ConfigSpace.ConfigurationSpace('sklearn.ensemble.RandomForestClassifier', seed)
     imputation = ConfigSpace.CategoricalHyperparameter(
         name='columntransformer__numeric__imputer__strategy', choices=['mean', 'median', 'most_frequent'])
+    # TODO: parameterize the number of estimators?
     n_estimators = ConfigSpace.Constant(
         name='randomforestclassifier__n_estimators', value=100)
     criterion = ConfigSpace.CategoricalHyperparameter(

@@ -3,7 +3,7 @@ import ConfigSpace
 
 def get_hyperparameter_search_space(seed):
     """
-    Neural Network search space based on a best effort using the scikit-learn
+    Gradient Boosting search space based on a best effort using the scikit-learn
     implementation. Note that for state of the art performance, other packages,
     such as xgboost, could be preferred.
 

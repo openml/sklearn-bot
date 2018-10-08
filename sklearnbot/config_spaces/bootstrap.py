@@ -15,7 +15,9 @@ def get_available_config_spaces():
     """
     return [
         'adaboost',
+        'bernoulli_nb',
         'decision_tree',
+        'extra_trees',
         'gradient_boosting',
         'neural_network',
         'random_forest',
