@@ -23,15 +23,15 @@ def get_hyperparameter_search_space(seed):
     hidden_layer_sizes = ConfigSpace.UniformIntegerHyperparameter(
         name='mlpclassifier__hidden_layer_sizes', lower=32, upper=2048, default_value=2048)
     activation = ConfigSpace.CategoricalHyperparameter(
-        name='mlpclassifier__activation', choices=['identity', 'logistic', 'tanh', 'relu'], default='relu')
+        name='mlpclassifier__activation', choices=['identity', 'logistic', 'tanh', 'relu'], default_value='relu')
     solver = ConfigSpace.CategoricalHyperparameter(
-        name='mlpclassifier__solver', choices=['lbfgs', 'sgd', 'adam'], default='adam')
+        name='mlpclassifier__solver', choices=['lbfgs', 'sgd', 'adam'], default_value='adam')
     alpha = ConfigSpace.UniformFloatHyperparameter(
         name='mlpclassifier__alpha', lower=1e-5, upper=1e-1, log=True, default_value=1e-4)
     batch_size = ConfigSpace.UniformIntegerHyperparameter(
         name='mlpclassifier__batch_size', lower=32, upper=4096, default_value=200)
     learning_rate = ConfigSpace.CategoricalHyperparameter(
-        name='mlpclassifier__learning_rate', choices=['constant', 'invscaling', 'adaptive'], default='constrant')
+        name='mlpclassifier__learning_rate', choices=['constant', 'invscaling', 'adaptive'], default_value='constant')
     learning_rate_init = ConfigSpace.UniformFloatHyperparameter(
         name='mlpclassifier__learning_rate_init', lower=1e-5, upper=1e-1, log=True, default_value=1e-04)
     # TODO: Sensible range??
@@ -72,6 +72,7 @@ def get_hyperparameter_search_space(seed):
         max_iter,
         shuffle,
         tol,
+        momentum,
         nesterovs_momentum,
         early_stopping,
         validation_fraction,
@@ -87,25 +88,26 @@ def get_hyperparameter_search_space(seed):
     tol_condition = ConfigSpace.InCondition(tol, learning_rate, ['constant', 'invscaling'])
     momentum_confition = ConfigSpace.EqualsCondition(momentum, solver, 'sgd')
     nesterovs_momentum_confition_solver = ConfigSpace.EqualsCondition(nesterovs_momentum, solver, 'sgd')
+    nesterovs_momentum_confition_momentum = ConfigSpace.GreaterThanCondition(nesterovs_momentum, momentum, 0)
+    nesterovs_momentum_conjunstion = ConfigSpace.AndConjunction(nesterovs_momentum_confition_solver,
+                                                                nesterovs_momentum_confition_momentum)
     early_stopping_condition = ConfigSpace.InCondition(early_stopping, solver, ['sgd', 'adam'])
     validation_fraction_condition = ConfigSpace.EqualsCondition(validation_fraction, early_stopping, True)
     beta_1_condition = ConfigSpace.EqualsCondition(beta_1, solver, 'adam')
+    beta_2_condition = ConfigSpace.EqualsCondition(beta_2, solver, 'adam')
     n_iter_no_change_condition_solver = ConfigSpace.InCondition(n_iter_no_change, solver, ['sgd', 'adam'])
-    n_iter_no_change_condition_max_iter = ConfigSpace.LessThanCondition(n_iter_no_change, max_iter)
 
-    cs.add_conditions([
-        batch_size_condition,
-        learning_rate_init_condition,
-        power_t_condition,
-        shuffle_confition,
-        tol_condition,
-        momentum_confition,
-        nesterovs_momentum_confition_solver,
-        early_stopping_condition,
-        validation_fraction_condition,
-        beta_1_condition,
-        n_iter_no_change_condition_solver,
-        n_iter_no_change_condition_max_iter,
-    ])
+    cs.add_condition(batch_size_condition)
+    cs.add_condition(learning_rate_init_condition)
+    cs.add_condition(power_t_condition)
+    cs.add_condition(shuffle_confition)
+    cs.add_condition(tol_condition)
+    cs.add_condition(momentum_confition)
+    cs.add_condition(nesterovs_momentum_conjunstion)
+    cs.add_condition(early_stopping_condition)
+    cs.add_condition(validation_fraction_condition)
+    cs.add_condition(beta_1_condition)
+    cs.add_condition(beta_2_condition)
+    cs.add_condition(n_iter_no_change_condition_solver)
 
     return cs

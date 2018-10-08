@@ -32,7 +32,7 @@ def get_hyperparameter_search_space(seed):
     coef0 = ConfigSpace.UniformFloatHyperparameter(
         name='svc__coef0', lower=-1, upper=1, default_value=0)
     shrinking = ConfigSpace.CategoricalHyperparameter(
-        name='svc__shrinking', upper=[True, False], default_value=True)
+        name='svc__shrinking', choices=[True, False], default_value=True)
     tol = ConfigSpace.UniformFloatHyperparameter(
         name='svc__tol', lower=1e-5, upper=1e-1, default_value=1e-3, log=True)
     max_iter = ConfigSpace.UnParametrizedHyperparameter('svc__max_iter', -1)
