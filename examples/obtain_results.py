@@ -21,6 +21,8 @@ def parse_args():
                         help='if true, obtains the results per fold (opposed to averaged results)')
     parser.add_argument('--normalize', action='store_true',
                         help='if true, scales the performance result per task to [0, 1]')
+    parser.add_argument('--meta_features', action='store_true',
+                        help='if true, also creates a dataset with the meta-features')
     parser.add_argument('--openml_apikey', type=str, default=None, help='the openml api key')
     parser.add_argument('--openml_server', type=str, default=None, help='the openml server location')
     parser.add_argument('--classifier_name', type=str, choices=all_classifiers, default='decision_tree',
@@ -52,7 +54,7 @@ def run():
     if flow_id is False:
         raise ValueError('Flow not recognized, this means that it does not exist on the OpenML server yet.')
 
-    meta_data = openmlcontrib.meta.get_tasks_result_as_dataframe(
+    performance_data = openmlcontrib.meta.get_tasks_result_as_dataframe(
         task_ids=study.tasks,
         flow_id=flow_id,
         num_runs=args.num_runs,
@@ -70,7 +72,9 @@ def run():
     output_directory = os.path.join(args.output_directory, 'results')
     os.makedirs(output_directory, exist_ok=True)
     # create the task / parameters / performance arff
-    filename = os.path.join(output_directory, 'results_%s.arff' % args.classifier_name)
+    filename = os.path.join(output_directory,
+                            'results__%d__%s__%s.arff' % (args.num_runs, args.classifier_name,
+                                                          '__'.join(args.scoring)))
     relation_name = 'openml-meta-flow-%d' % flow_id
     json_meta = {'flow_id': flow_id,
                  'openml_server': openml.config.server,
@@ -79,27 +83,26 @@ def run():
                  'study_id': args.study_id,
                  'max_runs_per_task': args.num_runs}
     with open(filename, 'w') as fp:
-        arff.dump(openmlcontrib.meta.dataframe_to_arff(meta_data,
+        arff.dump(openmlcontrib.meta.dataframe_to_arff(performance_data,
                                                        relation_name,
                                                        json.dumps(json_meta)), fp)
-    print(sklearnbot.utils.get_time(), 'Stored ARFF file with vanilla results to', filename)
+    print(sklearnbot.utils.get_time(), 'Stored performance results as ARFF '
+                                       'file with vanilla results to', filename)
 
-    # # create the task meta-features * parameters * performance arff
-    # task_qualities = {}
-    # for task_id in relevant_tasks:
-    #     task = openml.tasks.get_task(task_id)
-    #     task_qualities[task_id] = task.get_dataset().qualities
-    # # index of qualities: the task id
-    # qualities_with_na = pandas.DataFrame.from_dict(task_qualities, orient='index', dtype=np.float)
-    # qualities = pandas.DataFrame.dropna(qualities_with_na, axis=1, how='any')
-    #
-    # setup_data_with_meta_features = setup_data_all.join(qualities, on='task_id', how='inner')
-    #
-    # filename = os.path.join(args.output_directory, 'meta_%s.arff' % args.classifier_name)
-    # with open(filename, 'w') as fp:
-    #     arff.dump(openmlcontrib.meta.dataframe_to_arff(setup_data_with_meta_features,
-    #                                                    relation_name,
-    #                                                    json.dumps(json_meta)), fp)
+    if args.meta_features:
+        # create the task meta-features * parameters * performance arff
+        meta_features = openmlcontrib.meta.get_tasks_qualities_as_dataframe(study.tasks, -99999, True)
+        setup_data_with_meta_features = performance_data.join(meta_features, on='task_id', how='inner')
+
+        filename = os.path.join(args.output_directory,
+                                'results__%d__%s__%s.arff' % (args.num_runs, args.classifier_name,
+                                                              '__'.join(args.scoring)))
+        with open(filename, 'w') as fp:
+            arff.dump(openmlcontrib.meta.dataframe_to_arff(setup_data_with_meta_features,
+                                                           relation_name,
+                                                           json.dumps(json_meta)), fp)
+        print(sklearnbot.utils.get_time(), 'Stored meta-features and results as ARFF '
+                                           'file with vanilla results to', filename)
 
 
 if __name__ == '__main__':
