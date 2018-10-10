@@ -94,7 +94,7 @@ def run():
         meta_features = openmlcontrib.meta.get_tasks_qualities_as_dataframe(study.tasks, -99999, True)
         setup_data_with_meta_features = performance_data.join(meta_features, on='task_id', how='inner')
 
-        filename = os.path.join(args.output_directory,
+        filename = os.path.join(output_directory,
                                 'results__%d__%s__%s.arff' % (args.num_runs, args.classifier_name,
                                                               '__'.join(args.scoring)))
         with open(filename, 'w') as fp:
