@@ -85,13 +85,13 @@ a number lower than the actual available runs will allow for efficient caching.
 interval [0, 1] per task. 
 * `openml_server`: The server from which the results should be downloaded. Make
 sure this is the same as the server to which the results where uploaded.
+* `openml_apikey`: API key to authenticate yourself with. Can be found on your
+OpenML profile. (Although most operations involve obtaining results, we need to
+do a single post-request to the server as well.)
 * `classifier_name`: The classifier from which the results should be downloaded.
 Make sure that this is the same as the classifier with which the bot was ran. 
 Note that the current functionality does not support the option to obtain the
 results from all classifiers at once yet. 
-
-Note that there is no need to provide an API key, as the OpenML server is only
-used for read operations. 
 
 ## Feature Requests
 

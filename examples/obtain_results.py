@@ -21,6 +21,7 @@ def parse_args():
                         help='if true, obtains the results per fold (opposed to averaged results)')
     parser.add_argument('--normalize', action='store_true',
                         help='if true, scales the performance result per task to [0, 1]')
+    parser.add_argument('--openml_apikey', type=str, default=None, help='the openml api key')
     parser.add_argument('--openml_server', type=str, default=None, help='the openml server location')
     parser.add_argument('--classifier_name', type=str, choices=all_classifiers, default='decision_tree',
                         help='the classifier to run')
@@ -29,6 +30,7 @@ def parse_args():
 
 def run():
     args = parse_args()
+    openml.config.apikey = args.openml_apikey
     if args.openml_server:
         openml.config.server = args.openml_server
     else:
@@ -41,7 +43,7 @@ def run():
 
     # acquire config space
     config_space = sklearnbot.config_spaces.get_config_space(args.classifier_name, None)
-    # acquite classifier and flow, for flow id
+    # acquire classifier and flow, for flow id
     clf = sklearnbot.sklearn.deserialize(config_space, [], [])
     flow = openml.flows.sklearn_to_flow(clf)
     flow_id = openml.flows.flow_exists(flow.name, flow.external_version)
