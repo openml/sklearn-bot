@@ -95,8 +95,8 @@ def run():
         setup_data_with_meta_features = performance_data.join(meta_features, on='task_id', how='inner')
 
         filename = os.path.join(output_directory,
-                                'results__%d__%s__%s.arff' % (args.num_runs, args.classifier_name,
-                                                              '__'.join(args.scoring)))
+                                'metafeatures__%d__%s__%s.arff' % (args.num_runs, args.classifier_name,
+                                                                   '__'.join(args.scoring)))
         with open(filename, 'w') as fp:
             arff.dump(openmlcontrib.meta.dataframe_to_arff(setup_data_with_meta_features,
                                                            relation_name,
