@@ -22,8 +22,8 @@ def get_hyperparameter_search_space(seed: int) -> ConfigSpace.ConfigurationSpace
         name='columntransformer__numeric__imputer__strategy', choices=['mean', 'median', 'most_frequent'], default_value='median')
     criterion = ConfigSpace.CategoricalHyperparameter(
         name='decisiontreeclassifier__criterion', choices=['gini', 'entropy'], default_value='gini')
-    max_depth = ConfigSpace.UniformFloatHyperparameter(
-        name='decisiontreeclassifier__max_depth', lower=0., upper=2., default_value=0.5)
+    # max_depth = ConfigSpace.UniformFloatHyperparameter(
+    #    name='decisiontreeclassifier__max_depth', lower=0., upper=2., default_value=0.5)
     min_samples_split = ConfigSpace.UniformIntegerHyperparameter(
         name='decisiontreeclassifier__min_samples_split', lower=2, upper=20, default_value=2)
     min_samples_leaf = ConfigSpace.UniformIntegerHyperparameter(
@@ -41,7 +41,7 @@ def get_hyperparameter_search_space(seed: int) -> ConfigSpace.ConfigurationSpace
     cs.add_hyperparameters([strategy,
                             criterion,
                             max_features,
-                            max_depth,
+                            # max_depth,
                             min_samples_split,
                             min_samples_leaf,
                             min_weight_fraction_leaf,
