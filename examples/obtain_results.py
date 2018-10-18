@@ -86,8 +86,7 @@ def run():
         arff.dump(openmlcontrib.meta.dataframe_to_arff(performance_data,
                                                        relation_name,
                                                        json.dumps(json_meta)), fp)
-    print(sklearnbot.utils.get_time(), 'Stored performance results as ARFF '
-                                       'file with vanilla results to', filename)
+    logging.info('Stored performance results as ARFF file with vanilla results to %s ' % filename)
 
     if args.meta_features:
         # create the task meta-features * parameters * performance arff
@@ -101,8 +100,7 @@ def run():
             arff.dump(openmlcontrib.meta.dataframe_to_arff(setup_data_with_meta_features,
                                                            relation_name,
                                                            json.dumps(json_meta)), fp)
-        print(sklearnbot.utils.get_time(), 'Stored meta-features and results as ARFF '
-                                           'file with vanilla results to', filename)
+        logging.info('Stored meta-features and results as ARFF file with vanilla results to %s' % filename)
 
 
 if __name__ == '__main__':

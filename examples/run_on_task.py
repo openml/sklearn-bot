@@ -1,4 +1,5 @@
 import argparse
+import logging
 import openml
 import os
 import sklearnbot
@@ -8,7 +9,6 @@ import sklearnbot
 def parse_args():
     all_classifiers = sklearnbot.config_spaces.get_available_config_spaces(True)
     parser = argparse.ArgumentParser(description='Generate data for openml-pimp project')
-    all_classifiers = ['decision_tree']
     parser.add_argument('--n_executions', type=int,  default=1000, help='number of runs to be executed. ')
     parser.add_argument('--task_id', type=int, required=True, help='the openml task id')
     parser.add_argument('--openml_server', type=str, default=None, help='the openml server location')
@@ -26,6 +26,9 @@ def parse_args():
 
 
 def run():
+    root = logging.getLogger()
+    root.setLevel(logging.INFO)
+
     args = parse_args()
     if args.openml_apikey:
         openml.config.apikey = args.openml_apikey
@@ -43,9 +46,9 @@ def run():
                                                                  output_dir,
                                                                  args.upload_result)
         if success:
-            print(sklearnbot.utils.get_time(), 'Run was executed successfully. Run id=%s; folder=%s' % (run_id, folder))
+            logging.info('Run was executed successfully. Run id=%s; folder=%s' % (run_id, folder))
         else:
-            print(sklearnbot.utils.get_time(), 'A problem occurred. Run id=%s; folder=%s' % (run_id, folder))
+            logging.warning('A problem occurred. Run id=%s; folder=%s' % (run_id, folder))
 
 
 if __name__ == '__main__':

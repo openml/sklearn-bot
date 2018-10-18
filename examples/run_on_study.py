@@ -1,4 +1,5 @@
 import argparse
+import logging
 import openml
 import os
 import sklearnbot
@@ -27,6 +28,9 @@ def parse_args():
 
 
 def run():
+    root = logging.getLogger()
+    root.setLevel(logging.INFO)
+
     args = parse_args()
     if args.openml_apikey:
         openml.config.apikey = args.openml_apikey
@@ -46,9 +50,9 @@ def run():
                                                                  output_dir,
                                                                  args.upload_result)
         if success:
-            print(sklearnbot.utils.get_time(), 'Run was executed successfully. Run id=%s; folder=%s' % (run_id, folder))
+            logging.info('Run was executed successfully. Run id=%s; folder=%s' % (run_id, folder))
         else:
-            print(sklearnbot.utils.get_time(), 'A problem occurred. Run id=%s; folder=%s' % (run_id, folder))
+            logging.warning('A problem occurred. Run id=%s; folder=%s' % (run_id, folder))
 
 
 if __name__ == '__main__':

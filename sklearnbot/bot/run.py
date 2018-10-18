@@ -1,7 +1,9 @@
 import ConfigSpace
+import logging
 import openml
 import os
 import shutil
+import sklearn
 import sklearnbot
 import traceback
 import typing
@@ -53,7 +55,7 @@ def run_bot_on_task(task_id: int,
         data_name = task.get_dataset().name
         data_qualities = task.get_dataset().qualities
         data_tuple = (task.task_id, data_name, data_qualities['NumberOfFeatures'], data_qualities['NumberOfInstances'])
-        print(sklearnbot.utils.get_time(), "Obtained task %d (%s); %s attributes; %s observations" % data_tuple)
+        logging.info('Obtained task %d (%s); %s attributes; %s observations' % data_tuple)
 
         # obtain deserialized classifier
         nominal_indices = task.get_dataset().get_features_by_type('nominal', [task.target_name])
@@ -62,11 +64,13 @@ def run_bot_on_task(task_id: int,
 
         # sample configuration and set hyperparameters
         configuration = configuration_space.sample_configuration(1)
-        print(sklearnbot.utils.get_time(), configuration.get_dictionary())
+        logging.info('Configuration: %s' % configuration.get_dictionary())
         classifier.set_params(**configuration.get_dictionary())
 
         # invoke OpenML run
         run = openml.runs.run_model_on_task(task, classifier)
+        score = run.get_metric_fn(sklearn.metrics.accuracy_score)
+        logging.info('Task %d - %s; Accuracy: %0.2f' % (task_id, task.get_dataset().name, score.mean()))
         local_run_dir = os.path.join(output_dir, str(task_id), str(uuid.uuid4()))
         run.to_filesystem(local_run_dir, store_model=False)
         if upload_and_delete:
