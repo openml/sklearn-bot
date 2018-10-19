@@ -23,6 +23,8 @@ def parse_args():
                         help='if true, scales the performance result per task to [0, 1]')
     parser.add_argument('--meta_features', action='store_true',
                         help='if true, also creates a dataset with the meta-features')
+    parser.add_argument('--raise_few_runs', action='store_true', help='if true, it enforces that each task has the '
+                                                                      'minimum amount of runs, or it raises an error')
     parser.add_argument('--openml_apikey', type=str, default=None, help='the openml api key')
     parser.add_argument('--openml_server', type=str, default=None, help='the openml server location')
     parser.add_argument('--classifier_name', type=str, choices=all_classifiers, default='decision_tree',
@@ -59,7 +61,7 @@ def run():
         flow_id=flow_id,
         num_runs=args.num_runs,
         per_fold=args.per_fold,
-        raise_few_runs=False,
+        raise_few_runs=args.raise_few_runs,
         configuration_space=config_space,
         evaluation_measures=args.scoring,
         normalize=args.normalize,
