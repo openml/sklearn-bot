@@ -2,6 +2,7 @@ import ConfigSpace
 import importlib
 import sklearn
 import sklearn.compose
+import sklearn.feature_selection
 import sklearn.impute
 import typing
 
@@ -12,9 +13,9 @@ def deserialize(configuration_space: ConfigSpace.ConfigurationSpace,
         -> sklearn.base.BaseEstimator:
     """
     Takes a ConfigSpace object and deserializes it back to an appropriate
-    scikit-learn Pipeline. It will be a pipeline, containing a missing value
-    indicator (numeric attributes only), imputer, scaler (numeric attributes
-    only), onehotencoder (nominal attributes only) and the classifier.
+    scikit-learn Pipeline. It will be a pipeline, containing an
+    imputer, scaler (numeric attributes only), onehotencoder (nominal
+    attributes only), variance threshold and the classifier.
 
     Parameters
     ----------
@@ -34,7 +35,6 @@ def deserialize(configuration_space: ConfigSpace.ConfigurationSpace,
         The instantiated classifier with default hyperparameters
     """
     numeric_transformer = sklearn.pipeline.make_pipeline(
-        sklearn.impute.MissingIndicator(error_on_new=False),
         sklearn.preprocessing.Imputer(),
         sklearn.preprocessing.StandardScaler())
 
@@ -54,7 +54,9 @@ def deserialize(configuration_space: ConfigSpace.ConfigurationSpace,
     module_name = configuration_space.name.rsplit('.', 1)
     model_class = getattr(importlib.import_module(module_name[0]),
                           module_name[1])
-    clf = sklearn.pipeline.make_pipeline(transformer, model_class())
+    clf = sklearn.pipeline.make_pipeline(transformer,
+                                         sklearn.feature_selection.VarianceThreshold(),
+                                         model_class())
     if configuration_space.meta is not None:
         clf.set_params(**configuration_space.meta)
     return clf
