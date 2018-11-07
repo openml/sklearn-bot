@@ -60,7 +60,7 @@ def run_bot_on_task(task_id: int,
         # obtain deserialized classifier
         nominal_indices = task.get_dataset().get_features_by_type('nominal', [task.target_name])
         numeric_indices = task.get_dataset().get_features_by_type('numeric', [task.target_name])
-        classifier = sklearnbot.sklearn.deserialize(configuration_space, numeric_indices, nominal_indices)
+        classifier = sklearnbot.sklearn.as_estimator(configuration_space, numeric_indices, nominal_indices)
 
         # sample configuration and set hyperparameters
         configuration = configuration_space.sample_configuration(1)
