@@ -48,7 +48,7 @@ def run():
     # acquire config space
     config_space = sklearnbot.config_spaces.get_config_space(args.classifier_name, None)
     # acquire classifier and flow, for flow id
-    clf = sklearnbot.sklearn.deserialize(config_space, [], [])
+    clf = sklearnbot.sklearn.as_estimator(config_space, [], [])
     flow = openml.flows.sklearn_to_flow(clf)
     flow_id = openml.flows.flow_exists(flow.name, flow.external_version)
     cache_directory = os.path.join(args.output_directory, 'cache')
