@@ -43,7 +43,9 @@ def run():
     root = logging.getLogger()
     root.setLevel(logging.INFO)
 
+    logging.info('started obtain results script with parameters %s' % str(args))
     study = openml.study.get_study(args.study_id, 'tasks')
+    logging.info('obtained study %s with %d tasks' % (args.study_id, len(study.tasks)))
 
     # acquire config space
     config_space = sklearnbot.config_spaces.get_config_space(args.classifier_name, None)
