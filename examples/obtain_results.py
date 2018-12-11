@@ -2,10 +2,13 @@ import arff
 import argparse
 import json
 import logging
+import numpy as np
 import openml
 import openmlcontrib
 import os
 import sklearnbot
+
+IMPUTE_NA = -99999  # Placeholder for nan values
 
 
 def parse_args():
@@ -29,7 +32,8 @@ def parse_args():
     parser.add_argument('--openml_server', type=str, default=None, help='the openml server location')
     parser.add_argument('--classifier_name', type=str, choices=all_classifiers, default='decision_tree',
                         help='the classifier to run')
-    return parser.parse_args()
+    args_ = parser.parse_args()
+    return args_
 
 
 def run():
@@ -69,6 +73,20 @@ def run():
         normalize=args.normalize,
         cache_directory=cache_directory
     )
+    if args.average_folds:
+        if not args.per_fold:
+            raise ValueError('Can only average across folds if per_fold option is set')
+        group_by = config_space.get_hyperparameter_names() + ['task_id']
+        # important to impute na's with a out of range value
+        performance_data = performance_data.fillna(IMPUTE_NA).groupby(group_by).agg('mean')
+        del performance_data['repeat_nr']
+        del performance_data['fold_nr']
+        print(set(performance_data.columns.values))
+        print(set(args.scoring))
+        if set(performance_data.columns.values) != set(args.scoring):
+            raise ValueError()
+        # important to impute the NA's back
+        performance_data = performance_data.reset_index().replace(IMPUTE_NA, np.nan)
 
     # if len(setup_data_all) < args.num_runs * len(relevant_tasks) * 0.25:
     #     raise ValueError('Num results suspiciously low. Please check.')
