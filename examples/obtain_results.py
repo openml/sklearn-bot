@@ -81,8 +81,6 @@ def run():
         performance_data = performance_data.fillna(IMPUTE_NA).groupby(group_by).agg('mean')
         del performance_data['repeat_nr']
         del performance_data['fold_nr']
-        print(set(performance_data.columns.values))
-        print(set(args.scoring))
         if set(performance_data.columns.values) != set(args.scoring):
             raise ValueError()
         # important to impute the NA's back
