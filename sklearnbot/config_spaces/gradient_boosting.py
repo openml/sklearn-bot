@@ -23,8 +23,9 @@ def get_hyperparameter_search_space(seed):
         name='columntransformer__numeric__imputer__strategy', choices=['mean', 'median', 'most_frequent'])
     # fixed to deviance, as exponential requires two classes
     loss = ConfigSpace.hyperparameters.Constant(name='gradientboostingclassifier__loss', value='deviance')
+    # JvR: changed after conversation with AM on 2019-01-17
     learning_rate = ConfigSpace.hyperparameters.UniformFloatHyperparameter(
-        name='gradientboostingclassifier__learning_rate', lower=0.01, upper=2, default_value=0.1, log=True)
+        name='gradientboostingclassifier__learning_rate', lower=0.00001, upper=0.1, default_value=0.0001, log=True)
     n_estimators = ConfigSpace.hyperparameters.UniformIntegerHyperparameter(
         name='gradientboostingclassifier__n_estimators', lower=64, upper=512, default_value=100, log=False)
     subsample = ConfigSpace.UniformFloatHyperparameter(
@@ -38,8 +39,9 @@ def get_hyperparameter_search_space(seed):
     # TODO: upper bound?
     min_weight_fraction_leaf = ConfigSpace.hyperparameters.UniformFloatHyperparameter(
         name='gradientboostingclassifier__min_weight_fraction_leaf', lower=0.0, upper=0.5, default_value=0.0)
+    # JvR: changed after conversation with AM on 2019-01-17
     max_depth = ConfigSpace.hyperparameters.UniformIntegerHyperparameter(
-        name='gradientboostingclassifier__max_depth', lower=1, upper=10, default_value=3)
+        name='gradientboostingclassifier__max_depth', lower=1, upper=32, default_value=3)
     # TODO: upper bound?
     min_impurity_decrease = ConfigSpace.hyperparameters.UniformFloatHyperparameter(
         name='gradientboostingclassifier__min_impurity_decrease', lower=0.0, upper=1.0, default_value=0.0)
