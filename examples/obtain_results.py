@@ -32,6 +32,8 @@ def parse_args():
     parser.add_argument('--openml_server', type=str, default=None, help='the openml server location')
     parser.add_argument('--classifier_name', type=str, choices=all_classifiers, default='decision_tree',
                         help='the classifier to run')
+    parser.add_argument('--flow_id', type=int, default=6970,
+                        help='if known, the flow id of the classifier (can be induced)')
     args_ = parser.parse_args()
     return args_
 
@@ -55,8 +57,23 @@ def run():
     config_space = sklearnbot.config_spaces.get_config_space(args.classifier_name, None)
     # acquire classifier and flow, for flow id
     clf = sklearnbot.sklearn.as_estimator(config_space, [], [])
-    flow = openml.flows.sklearn_to_flow(clf)
-    flow_id = openml.flows.flow_exists(flow.name, flow.external_version)
+    if args.flow_id is None:
+        flow = openml.flows.sklearn_to_flow(clf)
+        flow_id = openml.flows.flow_exists(flow.name, flow.external_version)
+    else:
+        flow_id = args.flow_id
+        flow = openml.flows.get_flow(flow_id)
+
+    # check if hyperparameters are available
+    for param_name in config_space.get_hyperparameter_names():
+        parts = param_name.split("__")
+        if len(parts) == 1:
+            subflow = flow
+        else:
+            subflow = flow.get_subflow(parts[:-1])
+        if parts[-1] not in subflow.parameters:
+            raise ValueError('Missing hyperparameter %s in flow %s' % (param_name, flow.name))
+
     cache_directory = os.path.join(args.output_directory, 'cache')
 
     if flow_id is False:
@@ -73,18 +90,6 @@ def run():
         normalize=args.normalize,
         cache_directory=cache_directory
     )
-    if args.average_folds:
-        if not args.per_fold:
-            raise ValueError('Can only average across folds if per_fold option is set')
-        group_by = config_space.get_hyperparameter_names() + ['task_id']
-        # important to impute na's with a out of range value
-        performance_data = performance_data.fillna(IMPUTE_NA).groupby(group_by).agg('mean')
-        del performance_data['repeat_nr']
-        del performance_data['fold_nr']
-        if set(performance_data.columns.values) != set(args.scoring):
-            raise ValueError()
-        # important to impute the NA's back
-        performance_data = performance_data.reset_index().replace(IMPUTE_NA, np.nan)
 
     # if len(setup_data_all) < args.num_runs * len(relevant_tasks) * 0.25:
     #     raise ValueError('Num results suspiciously low. Please check.')
@@ -96,12 +101,15 @@ def run():
                             'results__%d__%s__%s.arff' % (args.num_runs, args.classifier_name,
                                                           '__'.join(args.scoring)))
     relation_name = 'openml-meta-flow-%d' % flow_id
-    json_meta = {'flow_id': flow_id,
-                 'openml_server': openml.config.server,
-                 'measure': args.scoring,
-                 'normalized_y': args.normalize,
-                 'study_id': args.study_id,
-                 'max_runs_per_task': args.num_runs}
+    json_meta = {
+        'flow_id': flow_id,
+        'openml_server': openml.config.server,
+        'col_measures': args.scoring,
+        'col_parameters': config_space.get_hyperparameter_names(),
+        'normalized_y': args.normalize,
+        'study_id': args.study_id,
+        'max_runs_per_task': args.num_runs
+    }
     with open(filename, 'w') as fp:
         arff.dump(openmlcontrib.meta.dataframe_to_arff(performance_data,
                                                        relation_name,
@@ -110,7 +118,7 @@ def run():
 
     if args.meta_features:
         # create the task meta-features * parameters * performance arff
-        meta_features = openmlcontrib.meta.get_tasks_qualities_as_dataframe(study.tasks, -99999, True)
+        meta_features = openmlcontrib.meta.get_tasks_qualities_as_dataframe(study.tasks, False, IMPUTE_NA, True)
         setup_data_with_meta_features = performance_data.join(meta_features, on='task_id', how='inner')
 
         filename = os.path.join(output_directory,
