@@ -68,7 +68,7 @@ def run_bot_on_task(task_id: int,
         classifier.set_params(**configuration.get_dictionary())
 
         # invoke OpenML run
-        run = openml.runs.run_model_on_task(task, classifier)
+        run = openml.runs.run_model_on_task(classifier, task)
         score = run.get_metric_fn(sklearn.metrics.accuracy_score)
         logging.info('Task %d - %s; Accuracy: %0.2f' % (task_id, task.get_dataset().name, score.mean()))
         local_run_dir = os.path.join(output_dir, str(task_id), str(uuid.uuid4()))
