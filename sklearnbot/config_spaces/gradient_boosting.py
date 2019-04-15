@@ -27,7 +27,7 @@ def get_hyperparameter_search_space(seed):
     learning_rate = ConfigSpace.hyperparameters.UniformFloatHyperparameter(
         name='gradientboostingclassifier__learning_rate', lower=0.00001, upper=0.1, default_value=0.0001, log=True)
     n_estimators = ConfigSpace.hyperparameters.UniformIntegerHyperparameter(
-        name='gradientboostingclassifier__n_estimators', lower=64, upper=512, default_value=100, log=False)
+        name='gradientboostingclassifier__n_estimators', lower=64, upper=2048, default_value=100, log=True)
     subsample = ConfigSpace.UniformFloatHyperparameter(
         name='gradientboostingclassifier__subsample', lower=0.0, upper=1.0, default_value=1.0)
     criterion = ConfigSpace.hyperparameters.CategoricalHyperparameter(
@@ -50,7 +50,7 @@ def get_hyperparameter_search_space(seed):
     validation_fraction = ConfigSpace.UniformFloatHyperparameter(
         name='gradientboostingclassifier__validation_fraction', lower=0, upper=1, default_value=0.1)
     n_iter_no_change = ConfigSpace.UniformIntegerHyperparameter(
-        name='gradientboostingclassifier__n_iter_no_change', lower=1, upper=1024, default_value=200)
+        name='gradientboostingclassifier__n_iter_no_change', lower=1, upper=2048, default_value=200)
     tol = ConfigSpace.UniformFloatHyperparameter(
         name='gradientboostingclassifier__tol', lower=1e-5, upper=1e-1, default_value=1e-4, log=True)
 
