@@ -30,7 +30,7 @@ def get_hyperparameter_search_space(seed):
         name='histgradientboostingclassifier__max_iter', lower=50, upper=500, default_value=100)
 
     max_leaf_nodes = ConfigSpace.hyperparameters.UniformIntegerHyperparameter(
-        name='histgradientboostingclassifier__max_leaf_nodes', lower=1, upper=256, default_value=31)  
+        name='histgradientboostingclassifier__max_leaf_nodes', lower=2, upper=256, default_value=31)  
 
     max_depth = ConfigSpace.hyperparameters.UniformIntegerHyperparameter(
         name='histgradientboostingclassifier__max_depth', lower=2, upper=20, default_value=None)
@@ -42,10 +42,10 @@ def get_hyperparameter_search_space(seed):
         name='histgradientboostingclassifier__l2_regularization', lower=1e-10, upper=1, default_value=0.0, log=True)
     
     max_bins = ConfigSpace.hyperparameters.UniformFloatHyperparameter(
-        name='histgradientboostingclassifier__max_bins', lower=1, upper=512, default_value=256)
+        name='histgradientboostingclassifier__max_bins', lower=2, upper=512, default_value=256)
 
     validation_fraction = ConfigSpace.UniformFloatHyperparameter(
-        name='histgradientboostingclassifier__validation_fraction', lower=0, upper=0.3, default_value=0.1)
+        name='histgradientboostingclassifier__validation_fraction', lower=0.1, upper=0.3, default_value=0.1)
 
     n_iter_no_change = ConfigSpace.UniformIntegerHyperparameter(
         name='histgradientboostingclassifier__n_iter_no_change', lower=1, upper=2048, default_value=None)
