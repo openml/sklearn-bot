@@ -9,4 +9,5 @@ import sklearnbot.config_spaces.neural_network
 import sklearnbot.config_spaces.random_forest
 import sklearnbot.config_spaces.sgd
 import sklearnbot.config_spaces.svc
+import sklearnbot.config_spaces.hist_gradient_boosting 
 from .bootstrap import get_available_config_spaces, get_config_space
