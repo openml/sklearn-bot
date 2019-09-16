@@ -20,23 +20,20 @@ def get_hyperparameter_search_space(seed) -> ConfigSpaceWrapper:
     """
     cs = ConfigSpace.ConfigurationSpace('sklearn.neighbors.KNeighborsClassifier', seed)
 
-    imputation = ConfigSpace.hyperparameters.CategoricalHyperparameter(
-        name='columntransformer__numeric__imputer__strategy', choices=['mean', 'median', 'most_frequent'])
     n_neighbors = ConfigSpace.hyperparameters.UniformIntegerHyperparameter(
-        name='kneighborsclassifier__n_neighbors', lower=1, upper=20, default_value=5)
+        name='n_neighbors', lower=1, upper=20, default_value=5)
     weights = ConfigSpace.hyperparameters.CategoricalHyperparameter(
-        name='kneighborsclassifier__weights', choices=['uniform', 'distance'], default_value='uniform')
+        name='weights', choices=['uniform', 'distance'], default_value='uniform')
     algorithm = ConfigSpace.hyperparameters.CategoricalHyperparameter(
-        name='kneighborsclassifier__algorithm', choices=['auto', 'ball_tree', 'kd_tree', 'brute'], default_value='auto')
+        name='algorithm', choices=['auto', 'ball_tree', 'kd_tree', 'brute'], default_value='auto')
     leaf_size = ConfigSpace.UniformIntegerHyperparameter(
-        name='kneighborsclassifier__leaf_size', lower=1, upper=50, default_value=1)
+        name='leaf_size', lower=1, upper=50, default_value=1)
     p = ConfigSpace.UniformIntegerHyperparameter(
-        name='kneighborsclassifier__p', lower=1, upper=5, default_value=2)
+        name='p', lower=1, upper=5, default_value=2)
     metric = ConfigSpace.hyperparameters.CategoricalHyperparameter(
-        name='kneighborsclassifier__metric', choices=['euclidean', 'manhattan', 'chebyshev', 'minkowski', 'wminkowski', 'seuclidean', 'mahalanobis'], default_value='minkowski')
+        name='metric', choices=['euclidean', 'manhattan', 'chebyshev', 'minkowski', 'wminkowski', 'seuclidean', 'mahalanobis'], default_value='minkowski')
 
     hyperparameters = [
-        imputation,
         n_neighbors,
         weights,
         algorithm,

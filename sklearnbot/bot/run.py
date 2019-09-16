@@ -1,4 +1,3 @@
-import ConfigSpace
 import logging
 import openml
 import os
@@ -9,9 +8,11 @@ import traceback
 import typing
 import uuid
 
+from sklearnbot.config_spaces import ConfigSpaceWrapper
+
 
 def run_bot_on_task(task_id: int,
-                    configuration_space: ConfigSpace.ConfigurationSpace,
+                    configuration_space_wrapper: ConfigSpaceWrapper,
                     output_dir: str,
                     upload_and_delete: bool) \
         -> typing.Tuple[bool, typing.Optional[int], typing.Optional[str]]:
@@ -23,8 +24,9 @@ def run_bot_on_task(task_id: int,
     task_id: int
         The OpenML task id to run the bot on
 
-    configuration_space: ConfigSpace.ConfigurationSpace
-        The config space from which a random configuration will be sampled
+    configuration_space_wrapper: ConfigSpace.ConfigurationSpace
+        The config space wrapper, that can be assembled to a config space, from which random configurations will be
+        sampled
 
     output_dir: str
         A writable directory where the intermediate run results can be stored,
@@ -48,6 +50,7 @@ def run_bot_on_task(task_id: int,
         If the run was executed successfully and the folder was not deleted,
         the path to the folder. None otherwise
     """
+    configuration_space = configuration_space_wrapper.assemble()
     local_run_dir = None
     try:
         # obtain task
@@ -60,7 +63,10 @@ def run_bot_on_task(task_id: int,
         # obtain deserialized classifier
         nominal_indices = task.get_dataset().get_features_by_type('nominal', [task.target_name])
         numeric_indices = task.get_dataset().get_features_by_type('numeric', [task.target_name])
-        classifier = sklearnbot.sklearn.as_pipeline(configuration_space, numeric_indices, nominal_indices)
+        if configuration_space_wrapper.wrapped_in_pipeline:
+            classifier = sklearnbot.sklearn.as_pipeline(configuration_space, numeric_indices, nominal_indices)
+        else:
+            classifier = sklearnbot.sklearn.as_estimator(configuration_space, False)
 
         # sample configuration and set hyperparameters
         configuration = configuration_space.sample_configuration(1)

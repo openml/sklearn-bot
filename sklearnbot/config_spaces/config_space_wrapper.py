@@ -10,6 +10,7 @@ class ConfigSpaceWrapper(object):
         self.config_space = config_space
         self.hyperparameters = hyperparameters
         self.conditions = conditions
+        self.wrapped_in_pipeline = False
 
     def assemble(self) -> ConfigSpace.ConfigurationSpace:
         config_space = copy.deepcopy(self.config_space)
@@ -17,3 +18,17 @@ class ConfigSpaceWrapper(object):
         if self.conditions is not None:
             config_space.add_conditions(self.conditions)
         return config_space
+
+    def wrap_in_fixed_pipeline(self):
+        if self.wrapped_in_pipeline:
+            raise ValueError('Can not doubly wrap the fixed pipeline.')
+
+        clf_name = self.config_space.name.rsplit('.', 1)[-1]
+        for hyperparameter in self.hyperparameters:
+            hyperparameter.name = '%s__%s' % (clf_name.lower(), hyperparameter.name)
+
+        imputation = ConfigSpace.hyperparameters.CategoricalHyperparameter(
+            name='columntransformer__numeric__imputer__strategy', choices=['mean', 'median', 'most_frequent'])
+        self.config_space.add_hyperparameter(imputation)
+
+        self.wrapped_in_pipeline = True

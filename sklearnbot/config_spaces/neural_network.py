@@ -20,49 +20,46 @@ def get_hyperparameter_search_space(seed) -> ConfigSpaceWrapper:
         The configuration space object
     """
     cs = ConfigSpace.ConfigurationSpace('sklearn.neural_network.MLPClassifier', seed)
-    strategy = ConfigSpace.CategoricalHyperparameter(
-        name='columntransformer__numeric__imputer__strategy', choices=['mean', 'median', 'most_frequent'])
     hidden_layer_sizes = ConfigSpace.UniformIntegerHyperparameter(
-        name='mlpclassifier__hidden_layer_sizes', lower=32, upper=2048, default_value=2048)
+        name='hidden_layer_sizes', lower=32, upper=2048, default_value=2048)
     activation = ConfigSpace.CategoricalHyperparameter(
-        name='mlpclassifier__activation', choices=['identity', 'logistic', 'tanh', 'relu'], default_value='relu')
+        name='activation', choices=['identity', 'logistic', 'tanh', 'relu'], default_value='relu')
     solver = ConfigSpace.CategoricalHyperparameter(
-        name='mlpclassifier__solver', choices=['lbfgs', 'sgd', 'adam'], default_value='adam')
+        name='solver', choices=['lbfgs', 'sgd', 'adam'], default_value='adam')
     alpha = ConfigSpace.UniformFloatHyperparameter(
-        name='mlpclassifier__alpha', lower=1e-5, upper=1e-1, log=True, default_value=1e-4)
+        name='alpha', lower=1e-5, upper=1e-1, log=True, default_value=1e-4)
     batch_size = ConfigSpace.UniformIntegerHyperparameter(
-        name='mlpclassifier__batch_size', lower=32, upper=4096, default_value=200)
+        name='batch_size', lower=32, upper=4096, default_value=200)
     learning_rate = ConfigSpace.CategoricalHyperparameter(
-        name='mlpclassifier__learning_rate', choices=['constant', 'invscaling', 'adaptive'], default_value='constant')
+        name='learning_rate', choices=['constant', 'invscaling', 'adaptive'], default_value='constant')
     learning_rate_init = ConfigSpace.UniformFloatHyperparameter(
-        name='mlpclassifier__learning_rate_init', lower=1e-5, upper=1e-1, log=True, default_value=1e-04)
+        name='learning_rate_init', lower=1e-5, upper=1e-1, log=True, default_value=1e-04)
     # TODO: Sensible range??
     power_t = ConfigSpace.UniformFloatHyperparameter(
-        name='mlpclassifier__power_t', lower=1e-5, upper=1, log=True, default_value=0.5)
+        name='power_t', lower=1e-5, upper=1, log=True, default_value=0.5)
     max_iter = ConfigSpace.UniformIntegerHyperparameter(
-        name='mlpclassifier__max_iter', lower=64, upper=1024, default_value=200)
+        name='max_iter', lower=64, upper=1024, default_value=200)
     shuffle = ConfigSpace.CategoricalHyperparameter(
-        name='mlpclassifier__shuffle', choices=[True, False], default_value=True)
+        name='shuffle', choices=[True, False], default_value=True)
     tol = ConfigSpace.UniformFloatHyperparameter(
-        name='mlpclassifier__tol', lower=1e-5, upper=1e-1, default_value=1e-4, log=True)
+        name='tol', lower=1e-5, upper=1e-1, default_value=1e-4, log=True)
     # TODO: log-scale?
     momentum = ConfigSpace.UniformFloatHyperparameter(
-        name='mlpclassifier__momentum', lower=0, upper=1, default_value=0.9)
+        name='momentum', lower=0, upper=1, default_value=0.9)
     nesterovs_momentum = ConfigSpace.CategoricalHyperparameter(
-        name='mlpclassifier__nesterovs_momentum', choices=[True, False], default_value=True)
+        name='nesterovs_momentum', choices=[True, False], default_value=True)
     early_stopping = ConfigSpace.CategoricalHyperparameter(
-        name='mlpclassifier__early_stopping', choices=[True, False], default_value=True)
+        name='early_stopping', choices=[True, False], default_value=True)
     validation_fraction = ConfigSpace.UniformFloatHyperparameter(
-        name='mlpclassifier__validation_fraction', lower=0, upper=1, default_value=0.1)
+        name='validation_fraction', lower=0, upper=1, default_value=0.1)
     beta_1 = ConfigSpace.UniformFloatHyperparameter(
-        name='mlpclassifier__beta_1', lower=0, upper=1, default_value=0.9)
+        name='beta_1', lower=0, upper=1, default_value=0.9)
     beta_2 = ConfigSpace.UniformFloatHyperparameter(
-        name='mlpclassifier__beta_2', lower=0, upper=1, default_value=0.999)
+        name='beta_2', lower=0, upper=1, default_value=0.999)
     n_iter_no_change = ConfigSpace.UniformIntegerHyperparameter(
-        name='mlpclassifier__n_iter_no_change', lower=1, upper=1024, default_value=200)
+        name='n_iter_no_change', lower=1, upper=1024, default_value=200)
 
     hyperparameters = [
-        strategy,
         hidden_layer_sizes,
         activation,
         solver,

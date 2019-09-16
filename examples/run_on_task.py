@@ -15,6 +15,8 @@ def parse_args():
     parser.add_argument('--openml_apikey', type=str, default=None, help='the apikey to authenticate to OpenML')
     parser.add_argument('--classifier_name', type=str, choices=all_classifiers, default='decision_tree',
                         help='the classifier to run')
+    parser.add_argument('--vanilla_estimator', action='store_true',
+                        help='if set, run vanilla classifiers rather than a pipeline')
     default_output_dir = os.path.join(os.path.expanduser('~'), 'experiments/sklearn-bot')
     parser.add_argument('--output_dir', type=str, default=default_output_dir,
                         help='Location to store finished runs')
@@ -37,12 +39,15 @@ def run():
     else:
         openml.config.server = 'https://test.openml.org/api/v1/'
 
-    configuration_space = sklearnbot.config_spaces.get_config_space(args.classifier_name, None).assemble()
+    configuration_space_wrapper = sklearnbot.config_spaces.get_config_space(args.classifier_name, None)
+    if not args.vanilla_estimator:
+        configuration_space_wrapper.wrap_in_fixed_pipeline()
+
     output_dir = os.path.join(args.output_dir, args.classifier_name)
 
     for i in range(args.n_executions):
         success, run_id, folder = sklearnbot.bot.run_bot_on_task(args.task_id,
-                                                                 configuration_space,
+                                                                 configuration_space_wrapper,
                                                                  output_dir,
                                                                  args.upload_result)
         if success:
