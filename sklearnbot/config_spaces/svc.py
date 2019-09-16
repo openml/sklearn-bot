@@ -35,7 +35,7 @@ def get_hyperparameter_search_space(seed) -> ConfigSpaceWrapper:
         name='shrinking', choices=[True, False], default_value=True)
     tol = ConfigSpace.UniformFloatHyperparameter(
         name='tol', lower=1e-5, upper=1e-1, default_value=1e-3, log=True)
-    max_iter = ConfigSpace.UnParametrizedHyperparameter('svc__max_iter', -1)
+    max_iter = ConfigSpace.UnParametrizedHyperparameter('max_iter', -1)
 
     hyperparameters = [
         C,
