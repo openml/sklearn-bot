@@ -39,7 +39,7 @@ def run():
         openml.config.server = args.openml_server
     else:
         openml.config.server = 'https://test.openml.org/api/v1/'
-    tasks = openml.study.get_study(args.study_id, 'tasks').tasks
+    tasks = openml.study.get_suite(args.study_id).tasks
 
     configuration_space_wrapper = sklearnbot.config_spaces.get_config_space(args.classifier_name, None)
     if not args.vanilla_estimator:
