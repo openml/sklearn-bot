@@ -1,7 +1,9 @@
 import ConfigSpace
 
+from sklearnbot.config_spaces import ConfigSpaceWrapper
 
-def get_hyperparameter_search_space(seed):
+
+def get_hyperparameter_search_space(seed) -> ConfigSpaceWrapper:
     """
     The random forest configuration space based on the search space from
     auto-sklearn:
@@ -42,7 +44,7 @@ def get_hyperparameter_search_space(seed):
     average = ConfigSpace.CategoricalHyperparameter(
         name='sgdclassifier__average', choices=[False, True], default_value=False)
 
-    cs.add_hyperparameters([
+    hyperparameters = [
         imputation,
         loss,
         penalty,
@@ -55,7 +57,7 @@ def get_hyperparameter_search_space(seed):
         eta0,
         power_t,
         average
-    ])
+    ]
 
     # TODO MF: add passive/aggressive here, although not properly documented?
     elasticnet = ConfigSpace.EqualsCondition(l1_ratio, penalty, 'elasticnet')
@@ -68,11 +70,11 @@ def get_hyperparameter_search_space(seed):
     # linear_model/sgd_fast.pyx#L603
     eta0_in_inv_con = ConfigSpace.InCondition(eta0, learning_rate, ['invscaling', 'constant'])
 
-    cs.add_conditions([
+    conditions = [
         elasticnet,
         epsilon_condition,
         power_t_condition,
         eta0_in_inv_con
-    ])
+    ]
 
-    return cs
+    return ConfigSpaceWrapper(cs, hyperparameters, conditions)

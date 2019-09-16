@@ -1,3 +1,4 @@
+from sklearnbot.config_spaces.config_space_wrapper import ConfigSpaceWrapper
 # contents of this library should be moved to other library
 import sklearnbot.config_spaces.adaboost
 import sklearnbot.config_spaces.bernoulli_nb

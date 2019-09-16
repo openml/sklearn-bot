@@ -1,8 +1,8 @@
-import ConfigSpace
 import random
 import sklearnbot
 import typing
 
+from sklearnbot.config_spaces import ConfigSpaceWrapper
 
 ALL_WILDCARD_NAME = 'all'
 
@@ -39,8 +39,7 @@ def get_available_config_spaces(allow_all: bool):
     return config_spaces
 
 
-def get_config_space(classifier_name: str, seed: typing.Optional[int]) \
-        -> ConfigSpace.ConfigurationSpace:
+def get_config_space(classifier_name: str, seed: typing.Optional[int]) -> ConfigSpaceWrapper:
     """
     Maps string names to a stored instantiation of the configuration space.
 

@@ -1,7 +1,9 @@
 import ConfigSpace
 
+from sklearnbot.config_spaces import ConfigSpaceWrapper
 
-def get_hyperparameter_search_space(seed: int) -> ConfigSpace.ConfigurationSpace:
+
+def get_hyperparameter_search_space(seed: int) -> ConfigSpaceWrapper:
     """
     The extra trees configuration space based on the search space from
     auto-sklearn:
@@ -43,7 +45,7 @@ def get_hyperparameter_search_space(seed: int) -> ConfigSpace.ConfigurationSpace
 
     bootstrap = ConfigSpace.CategoricalHyperparameter('extratreesclassifier__bootstrap', [True, False], default_value=False)
 
-    cs.add_hyperparameters([
+    hyperparameters = [
         strategy,
         n_estimators,
         criterion,
@@ -55,6 +57,6 @@ def get_hyperparameter_search_space(seed: int) -> ConfigSpace.ConfigurationSpace
         # max_leaf_nodes,
         min_impurity_decrease,
         bootstrap
-    ])
+    ]
 
-    return cs
+    return ConfigSpaceWrapper(cs, hyperparameters, None)

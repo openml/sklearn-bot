@@ -48,9 +48,37 @@ def _config_space_to_parameter_distributions(
     return result
 
 
-def as_estimator(configuration_space: ConfigSpace.ConfigurationSpace,
-                 numeric_indices: typing.List[int],
-                 nominal_indices: typing.List[int])\
+def as_estimator(configuration_space: ConfigSpace.ConfigurationSpace, skip_meta: bool):
+    """
+    Takes a ConfigSpace object and deserializes it back to an appropriate
+    scikit-learn classifier.
+
+    Parameters
+    ----------
+    configuration_space: ConfigSpace.ConfigurationSpace
+        The configuration space that holds the information to instantiate the
+        classifier
+
+    skip_meta: bool
+        If set to true, additional meta-features as defined by the config space will
+        not be set
+
+    Returns
+    -------
+    clf: sklearn.BaseEstimator
+        The instantiated classifier with default hyperparameters
+    """
+    # TODO: this should come from solid meta-data, rather than the name
+    module_name = configuration_space.name.rsplit('.', 1)
+    clf = getattr(importlib.import_module(module_name[0]), module_name[1])()
+    if not skip_meta and configuration_space.meta is not None:
+        clf.set_params(**configuration_space.meta)
+    return clf
+
+
+def as_pipeline(configuration_space: ConfigSpace.ConfigurationSpace,
+                numeric_indices: typing.List[int],
+                nominal_indices: typing.List[int])\
         -> sklearn.base.BaseEstimator:
     """
     Takes a ConfigSpace object and deserializes it back to an appropriate
@@ -91,16 +119,13 @@ def as_estimator(configuration_space: ConfigSpace.ConfigurationSpace,
             ('nominal', categorical_transformer, nominal_indices)],
         remainder='passthrough')
 
-    # TODO: this should come from solid meta-data, rather than the name
-    module_name = configuration_space.name.rsplit('.', 1)
-    model_class = getattr(importlib.import_module(module_name[0]),
-                          module_name[1])
-    clf = sklearn.pipeline.make_pipeline(transformer,
-                                         sklearn.feature_selection.VarianceThreshold(),
-                                         model_class())
+    clf = as_estimator(configuration_space, True)
+    pipeline = sklearn.pipeline.make_pipeline(transformer,
+                                              sklearn.feature_selection.VarianceThreshold(),
+                                              clf)
     if configuration_space.meta is not None:
-        clf.set_params(**configuration_space.meta)
-    return clf
+        pipeline.set_params(**configuration_space.meta)
+    return pipeline
 
 
 def as_search_cv(configuration_space: ConfigSpace.ConfigurationSpace,
@@ -130,8 +155,7 @@ def as_search_cv(configuration_space: ConfigSpace.ConfigurationSpace,
     clf: sklearn.BaseEstimator
         The instantiated classifier with default hyperparameters
     """
-    classifier = as_estimator(configuration_space, numeric_indices,
-                              nominal_indices)
+    classifier = as_pipeline(configuration_space, numeric_indices, nominal_indices)
     param_dist = _config_space_to_parameter_distributions(configuration_space)
     search = sklearn.model_selection.RandomizedSearchCV(
         estimator=classifier,

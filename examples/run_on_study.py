@@ -40,7 +40,7 @@ def run():
         openml.config.server = 'https://test.openml.org/api/v1/'
     tasks = openml.study.get_study(args.study_id, 'tasks').tasks
 
-    configuration_space = sklearnbot.config_spaces.get_config_space(args.classifier_name, None)
+    configuration_space = sklearnbot.config_spaces.get_config_space(args.classifier_name, None).assemble()
     output_dir = os.path.join(args.output_dir, args.classifier_name)
 
     for i in range(args.n_executions):

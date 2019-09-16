@@ -1,7 +1,9 @@
 import ConfigSpace
 
+from sklearnbot.config_spaces import ConfigSpaceWrapper
 
-def get_hyperparameter_search_space(seed):
+
+def get_hyperparameter_search_space(seed) -> ConfigSpaceWrapper:
     """
     Neural Network search space based on a best effort using the scikit-learn
     implementation. Note that for state of the art performance, other packages
@@ -59,7 +61,7 @@ def get_hyperparameter_search_space(seed):
     n_iter_no_change = ConfigSpace.UniformIntegerHyperparameter(
         name='mlpclassifier__n_iter_no_change', lower=1, upper=1024, default_value=200)
 
-    cs.add_hyperparameters([
+    hyperparameters = [
         strategy,
         hidden_layer_sizes,
         activation,
@@ -79,7 +81,7 @@ def get_hyperparameter_search_space(seed):
         beta_1,
         beta_2,
         n_iter_no_change,
-    ])
+    ]
 
     batch_size_condition = ConfigSpace.InCondition(batch_size, solver, ['sgd', 'adam'])
     learning_rate_init_condition = ConfigSpace.InCondition(learning_rate_init, solver, ['sgd', 'adam'])
@@ -97,17 +99,10 @@ def get_hyperparameter_search_space(seed):
     beta_2_condition = ConfigSpace.EqualsCondition(beta_2, solver, 'adam')
     n_iter_no_change_condition_solver = ConfigSpace.InCondition(n_iter_no_change, solver, ['sgd', 'adam'])
 
-    cs.add_condition(batch_size_condition)
-    cs.add_condition(learning_rate_init_condition)
-    cs.add_condition(power_t_condition)
-    cs.add_condition(shuffle_confition)
-    cs.add_condition(tol_condition)
-    cs.add_condition(momentum_confition)
-    cs.add_condition(nesterovs_momentum_conjunstion)
-    cs.add_condition(early_stopping_condition)
-    cs.add_condition(validation_fraction_condition)
-    cs.add_condition(beta_1_condition)
-    cs.add_condition(beta_2_condition)
-    cs.add_condition(n_iter_no_change_condition_solver)
+    conditions = [
+        batch_size_condition, learning_rate_init_condition, power_t_condition, shuffle_confition, tol_condition,
+        momentum_confition, nesterovs_momentum_conjunstion, early_stopping_condition, validation_fraction_condition,
+        beta_1_condition, beta_2_condition, n_iter_no_change_condition_solver
+    ]
 
-    return cs
+    return ConfigSpaceWrapper(cs, hyperparameters, conditions)

@@ -37,7 +37,7 @@ def run():
     else:
         openml.config.server = 'https://test.openml.org/api/v1/'
 
-    configuration_space = sklearnbot.config_spaces.get_config_space(args.classifier_name, None)
+    configuration_space = sklearnbot.config_spaces.get_config_space(args.classifier_name, None).assemble()
     output_dir = os.path.join(args.output_dir, args.classifier_name)
 
     for i in range(args.n_executions):

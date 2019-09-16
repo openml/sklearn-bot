@@ -1,7 +1,9 @@
 import ConfigSpace
 
+from sklearnbot.config_spaces import ConfigSpaceWrapper
 
-def get_hyperparameter_search_space(seed):
+
+def get_hyperparameter_search_space(seed) -> ConfigSpaceWrapper:
     """
     The Bernoulli NB configuration space based on the search space from
     auto-sklearn:
@@ -29,10 +31,6 @@ def get_hyperparameter_search_space(seed):
     fit_prior = ConfigSpace.CategoricalHyperparameter(
         name='bernoullinb__fit_prior', choices=[True, False], default_value=True)
 
-    cs.add_hyperparameters([
-        imputation,
-        alpha,
-        fit_prior
-    ])
+    hyperparameters = [imputation, alpha, fit_prior]
 
-    return cs
+    return ConfigSpaceWrapper(cs, hyperparameters, None)

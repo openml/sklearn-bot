@@ -1,7 +1,9 @@
 import ConfigSpace
 
+from sklearnbot.config_spaces import ConfigSpaceWrapper
 
-def get_hyperparameter_search_space(seed):
+
+def get_hyperparameter_search_space(seed) -> ConfigSpaceWrapper:
     """
     k-NN search space based on a best effort using the scikit-learn
     implementation.
@@ -33,7 +35,7 @@ def get_hyperparameter_search_space(seed):
     metric = ConfigSpace.hyperparameters.CategoricalHyperparameter(
         name='kneighborsclassifier__metric', choices=['euclidean', 'manhattan', 'chebyshev', 'minkowski', 'wminkowski', 'seuclidean', 'mahalanobis'], default_value='minkowski')
 
-    cs.add_hyperparameters([
+    hyperparameters = [
         imputation,
         n_neighbors,
         weights,
@@ -41,9 +43,9 @@ def get_hyperparameter_search_space(seed):
         leaf_size,
         p,
         metric,
-    ])
+    ]
 
     leaf_size_condition = ConfigSpace.InCondition(leaf_size, algorithm, ['ball_tree', 'kd_tree'])
-    cs.add_condition(leaf_size_condition)
+    conditions = [leaf_size_condition]
 
-    return cs
+    return ConfigSpaceWrapper(cs, hyperparameters, conditions)

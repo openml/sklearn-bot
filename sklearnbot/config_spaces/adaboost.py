@@ -1,8 +1,10 @@
 import ConfigSpace
+
+from sklearnbot.config_spaces import ConfigSpaceWrapper
 from sklearn.tree import DecisionTreeClassifier
 
 
-def get_hyperparameter_search_space(seed):
+def get_hyperparameter_search_space(seed) -> ConfigSpaceWrapper:
     """
     The adaboost configuration space based on the search space from
     auto-sklearn:
@@ -33,6 +35,6 @@ def get_hyperparameter_search_space(seed):
     max_depth = ConfigSpace.hyperparameters.UniformIntegerHyperparameter(
         name="adaboostclassifier__base_estimator__max_depth", lower=1, upper=10, default_value=1, log=False)
 
-    cs.add_hyperparameters([imputation, n_estimators, learning_rate, algorithm, max_depth])
+    hyperparameters = [imputation, n_estimators, learning_rate, algorithm, max_depth]
 
-    return cs
+    return ConfigSpaceWrapper(cs, hyperparameters, None)

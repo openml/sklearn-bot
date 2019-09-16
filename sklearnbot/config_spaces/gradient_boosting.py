@@ -1,7 +1,9 @@
 import ConfigSpace
 
+from sklearnbot.config_spaces import ConfigSpaceWrapper
 
-def get_hyperparameter_search_space(seed):
+
+def get_hyperparameter_search_space(seed) -> ConfigSpaceWrapper:
     """
     Gradient Boosting search space based on a best effort using the scikit-learn
     implementation. Note that for state of the art performance, other packages,
@@ -54,7 +56,7 @@ def get_hyperparameter_search_space(seed):
     tol = ConfigSpace.UniformFloatHyperparameter(
         name='gradientboostingclassifier__tol', lower=1e-5, upper=1e-1, default_value=1e-4, log=True)
 
-    cs.add_hyperparameters([
+    hyperparameters = [
         imputation,
         loss,
         learning_rate,
@@ -70,6 +72,6 @@ def get_hyperparameter_search_space(seed):
         validation_fraction,
         n_iter_no_change,
         tol,
-    ])
+    ]
 
-    return cs
+    return ConfigSpaceWrapper(cs, hyperparameters, None)

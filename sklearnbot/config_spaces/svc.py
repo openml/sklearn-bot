@@ -1,7 +1,9 @@
 import ConfigSpace
 
+from sklearnbot.config_spaces import ConfigSpaceWrapper
 
-def get_hyperparameter_search_space(seed):
+
+def get_hyperparameter_search_space(seed) -> ConfigSpaceWrapper:
     """
     The SVM configuration space based on the search space from
     auto-sklearn:
@@ -37,7 +39,7 @@ def get_hyperparameter_search_space(seed):
         name='svc__tol', lower=1e-5, upper=1e-1, default_value=1e-3, log=True)
     max_iter = ConfigSpace.UnParametrizedHyperparameter('svc__max_iter', -1)
 
-    cs.add_hyperparameters([
+    hyperparameters = [
         imputation,
         C,
         kernel,
@@ -47,11 +49,10 @@ def get_hyperparameter_search_space(seed):
         shrinking,
         tol,
         max_iter
-    ])
+    ]
 
     degree_depends_on_poly = ConfigSpace.EqualsCondition(degree, kernel, 'poly')
     coef0_condition = ConfigSpace.InCondition(coef0, kernel, ['poly', 'sigmoid'])
-    cs.add_condition(degree_depends_on_poly)
-    cs.add_condition(coef0_condition)
+    conditions = [degree_depends_on_poly, coef0_condition]
 
-    return cs
+    return ConfigSpaceWrapper(cs, hyperparameters, conditions)

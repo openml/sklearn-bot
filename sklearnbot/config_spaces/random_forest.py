@@ -1,7 +1,9 @@
 import ConfigSpace
 
+from sklearnbot.config_spaces import ConfigSpaceWrapper
 
-def get_hyperparameter_search_space(seed):
+
+def get_hyperparameter_search_space(seed) -> ConfigSpaceWrapper:
     """
     The random forest configuration space based on the search space from
     auto-sklearn:
@@ -39,7 +41,8 @@ def get_hyperparameter_search_space(seed):
     #   name='randomforestclassifier__max_leaf_nodes', value=None)
     bootstrap = ConfigSpace.CategoricalHyperparameter(
         name='randomforestclassifier__bootstrap', choices=[True, False], default_value=True)
-    cs.add_hyperparameters([
+
+    hyperparameters = [
         imputation,
         n_estimators,
         criterion,
@@ -50,6 +53,6 @@ def get_hyperparameter_search_space(seed):
         min_weight_fraction_leaf,
         # max_leaf_nodes,
         bootstrap
-    ])
+    ]
 
-    return cs
+    return ConfigSpaceWrapper(cs, hyperparameters, None)

@@ -54,9 +54,9 @@ def run():
     logging.info('obtained study %s with %d tasks' % (args.study_id, len(study.tasks)))
 
     # acquire config space
-    config_space = sklearnbot.config_spaces.get_config_space(args.classifier_name, None)
+    config_space = sklearnbot.config_spaces.get_config_space(args.classifier_name, None).assemble()
     # acquire classifier and flow, for flow id
-    clf = sklearnbot.sklearn.as_estimator(config_space, [], [])
+    clf = sklearnbot.sklearn.as_pipeline(config_space, [], [])
     if args.flow_id is None:
         flow = openml.flows.sklearn_to_flow(clf)
         flow_id = openml.flows.flow_exists(flow.name, flow.external_version)
