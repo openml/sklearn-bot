@@ -33,7 +33,9 @@ def parse_args():
     parser.add_argument('--openml_server', type=str, default=None, help='the openml server location')
     parser.add_argument('--classifier_name', type=str, choices=all_classifiers, default='decision_tree',
                         help='the classifier to run')
-    parser.add_argument('--flow_id', type=int, default=6970,
+    parser.add_argument('--vanilla_estimator', action='store_true',
+                        help='if set, run vanilla classifiers rather than a pipeline')
+    parser.add_argument('--flow_id', type=int, default=None,
                         help='if known, the flow id of the classifier (can be induced)')
     args_ = parser.parse_args()
     return args_
@@ -51,16 +53,24 @@ def run():
     root.setLevel(logging.INFO)
 
     logging.info('started obtain results script with parameters %s' % str(args))
-    study = openml.study.get_study(args.study_id, 'tasks')
+    study = openml.study.get_suite(args.study_id)
     logging.info('obtained study %s with %d tasks' % (args.study_id, len(study.tasks)))
 
     # acquire config space
-    config_space = sklearnbot.config_spaces.get_config_space(args.classifier_name, None).assemble()
+    configuration_space_wrapper = sklearnbot.config_spaces.get_config_space(args.classifier_name, None)
+    if not args.vanilla_estimator:
+        configuration_space_wrapper.wrap_in_fixed_pipeline()
+    config_space = configuration_space_wrapper.assemble()
     # acquire classifier and flow, for flow id
-    clf = sklearnbot.sklearn.as_pipeline(config_space, [], [])
+    if configuration_space_wrapper.wrapped_in_pipeline:
+        clf = sklearnbot.sklearn.as_pipeline(config_space, [], [])
+    else:
+        clf = sklearnbot.sklearn.as_estimator(config_space, False)
+
     if args.flow_id is None:
         openml_extension = openml.extensions.get_extension_by_model(clf)
-        flow = openml_extension.sklearn_to_flow(clf)
+        flow = openml_extension.model_to_flow(clf)
+        print(flow.name, flow.external_version)
         flow_id = openml.flows.flow_exists(flow.name, flow.external_version)
     else:
         flow_id = args.flow_id
