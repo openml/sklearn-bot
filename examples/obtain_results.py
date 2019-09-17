@@ -70,7 +70,6 @@ def run():
     if args.flow_id is None:
         openml_extension = openml.extensions.get_extension_by_model(clf)
         flow = openml_extension.model_to_flow(clf)
-        print(flow.name, flow.external_version)
         flow_id = openml.flows.flow_exists(flow.name, flow.external_version)
     else:
         flow_id = args.flow_id
