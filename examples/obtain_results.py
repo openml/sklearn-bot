@@ -16,6 +16,7 @@ def parse_args():
     parser = argparse.ArgumentParser(description='Generate data for openml-pimp project')
     parser.add_argument('--output_directory', type=str, default=os.path.expanduser('~') + '/experiments/sklearn-bot',
                         help='directory to store output')
+    parser.add_argument('--extension', type=str, choices=['arff', 'csv'], default='csv')
     parser.add_argument('--num_runs', type=int, default=500, help='max results per task to obtain, to limit time')
     parser.add_argument('--study_id', type=str, default=14, help='the tag to obtain the tasks from')
     parser.add_argument('--scoring', type=str, nargs='+', default=['predictive_accuracy'],
@@ -58,7 +59,8 @@ def run():
     # acquire classifier and flow, for flow id
     clf = sklearnbot.sklearn.as_pipeline(config_space, [], [])
     if args.flow_id is None:
-        flow = openml.flows.sklearn_to_flow(clf)
+        openml_extension = openml.extensions.get_extension_by_model(clf)
+        flow = openml_extension.sklearn_to_flow(clf)
         flow_id = openml.flows.flow_exists(flow.name, flow.external_version)
     else:
         flow_id = args.flow_id
@@ -98,8 +100,8 @@ def run():
     os.makedirs(output_directory, exist_ok=True)
     # create the task / parameters / performance arff
     filename = os.path.join(output_directory,
-                            'results__%d__%s__%s.arff' % (args.num_runs, args.classifier_name,
-                                                          '__'.join(args.scoring)))
+                            'results__%d__%s__%s.%s' % (args.num_runs, args.classifier_name,
+                                                        '__'.join(args.scoring), args.extension))
     relation_name = 'openml-meta-flow-%d' % flow_id
     json_meta = {
         'flow_id': flow_id,
@@ -111,9 +113,14 @@ def run():
         'max_runs_per_task': args.num_runs
     }
     with open(filename, 'w') as fp:
-        arff.dump(openmlcontrib.meta.dataframe_to_arff(performance_data,
-                                                       relation_name,
-                                                       json.dumps(json_meta)), fp)
+        if args.extension == 'arff':
+            arff.dump(openmlcontrib.meta.dataframe_to_arff(performance_data,
+                                                           relation_name,
+                                                           json.dumps(json_meta)), fp)
+        elif args.extension == 'csv':
+            performance_data.to_csv(fp)
+        else:
+            raise ValueError()
     logging.info('Stored performance results as ARFF file with vanilla results to %s ' % filename)
 
     if args.meta_features:
@@ -125,9 +132,14 @@ def run():
                                 'metafeatures__%d__%s__%s.arff' % (args.num_runs, args.classifier_name,
                                                                    '__'.join(args.scoring)))
         with open(filename, 'w') as fp:
-            arff.dump(openmlcontrib.meta.dataframe_to_arff(setup_data_with_meta_features,
-                                                           relation_name,
-                                                           json.dumps(json_meta)), fp)
+            if args.extension == 'arff':
+                arff.dump(openmlcontrib.meta.dataframe_to_arff(setup_data_with_meta_features,
+                                                               relation_name,
+                                                               json.dumps(json_meta)), fp)
+            elif args.extension == 'csv':
+                setup_data_with_meta_features.to_csv(fp)
+            else:
+                raise ValueError()
         logging.info('Stored meta-features and results as ARFF file with vanilla results to %s' % filename)
 
 
