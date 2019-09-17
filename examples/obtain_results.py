@@ -127,7 +127,7 @@ def run():
                                                            relation_name,
                                                            json.dumps(json_meta)), fp)
         elif args.extension == 'csv':
-            performance_data.to_csv(fp)
+            performance_data.to_csv(fp, index=False)
         else:
             raise ValueError()
     logging.info('Stored performance results as ARFF file with vanilla results to %s ' % filename)
@@ -146,7 +146,7 @@ def run():
                                                                relation_name,
                                                                json.dumps(json_meta)), fp)
             elif args.extension == 'csv':
-                setup_data_with_meta_features.to_csv(fp)
+                setup_data_with_meta_features.to_csv(fp, index=False)
             else:
                 raise ValueError()
         logging.info('Stored meta-features and results as ARFF file with vanilla results to %s' % filename)
