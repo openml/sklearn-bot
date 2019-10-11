@@ -73,6 +73,8 @@ def as_estimator(configuration_space: ConfigSpace.ConfigurationSpace, skip_meta:
     clf = getattr(importlib.import_module(module_name[0]), module_name[1])()
     if not skip_meta and configuration_space.meta is not None:
         clf.set_params(**configuration_space.meta)
+    if 'random_state' in clf.get_params().keys():
+        clf.set_params(random_state=0)
     return clf
 
 
@@ -160,6 +162,7 @@ def as_search_cv(configuration_space: ConfigSpace.ConfigurationSpace,
     search = sklearn.model_selection.RandomizedSearchCV(
         estimator=classifier,
         param_distributions=param_dist,
+        random_state=0,
         **kwargs
     )
     return search
