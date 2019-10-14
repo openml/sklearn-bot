@@ -19,6 +19,8 @@ class ConfigSpaceWrapper(object):
                 hp_index = idx
         del self.hyperparameters[hp_index]
 
+    def reset_conditions(self):
+        self.conditions = None
 
     def assemble(self) -> ConfigSpace.ConfigurationSpace:
         config_space = copy.deepcopy(self.config_space)
