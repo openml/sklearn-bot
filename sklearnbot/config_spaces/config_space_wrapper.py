@@ -12,6 +12,14 @@ class ConfigSpaceWrapper(object):
         self.conditions = conditions
         self.wrapped_in_pipeline = False
 
+    def exclude_hyperparameter(self, name):
+        hp_index = None
+        for idx, hp in enumerate(self.hyperparameters):
+            if hp.name == name:
+                hp_index = idx
+        del self.hyperparameters[hp_index]
+
+
     def assemble(self) -> ConfigSpace.ConfigurationSpace:
         config_space = copy.deepcopy(self.config_space)
         config_space.add_hyperparameters(self.hyperparameters)
