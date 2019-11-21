@@ -94,3 +94,6 @@ def run_bot_on_task(task_id: int,
     except openml.exceptions.OpenMLServerException:
         traceback.print_exc()
         return False, None, local_run_dir
+    except openml.exceptions.OpenMLRunsExistError:
+        traceback.print_exc()
+        return False, None, local_run_dir
