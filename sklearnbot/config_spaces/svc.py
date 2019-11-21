@@ -1,7 +1,9 @@
 import ConfigSpace
 
+from sklearnbot.config_spaces import ConfigSpaceWrapper
 
-def get_hyperparameter_search_space(seed):
+
+def get_hyperparameter_search_space(seed) -> ConfigSpaceWrapper:
     """
     The SVM configuration space based on the search space from
     auto-sklearn:
@@ -19,26 +21,23 @@ def get_hyperparameter_search_space(seed):
     """
     cs = ConfigSpace.ConfigurationSpace('sklearn.svm.SVC', seed)
 
-    imputation = ConfigSpace.CategoricalHyperparameter(
-        name='columntransformer__numeric__imputer__strategy', choices=['mean', 'median', 'most_frequent'])
     C = ConfigSpace.UniformFloatHyperparameter(
-        name='svc__C', lower=0.03125, upper=32768, log=True, default_value=1.0)
+        name='C', lower=0.03125, upper=32768, log=True, default_value=1.0)
     kernel = ConfigSpace.CategoricalHyperparameter(
-        name='svc__kernel', choices=['rbf', 'poly', 'sigmoid'], default_value='rbf')
+        name='kernel', choices=['rbf', 'poly', 'sigmoid'], default_value='rbf')
     degree = ConfigSpace.UniformIntegerHyperparameter(
-        name='svc__degree', lower=1, upper=5, default_value=3)
+        name='degree', lower=1, upper=5, default_value=3)
     gamma = ConfigSpace.UniformFloatHyperparameter(
-        name='svc__gamma', lower=3.0517578125e-05, upper=8, log=True, default_value=0.1)
+        name='gamma', lower=3.0517578125e-05, upper=8, log=True, default_value=0.1)
     coef0 = ConfigSpace.UniformFloatHyperparameter(
-        name='svc__coef0', lower=-1, upper=1, default_value=0)
+        name='coef0', lower=-1, upper=1, default_value=0)
     shrinking = ConfigSpace.CategoricalHyperparameter(
-        name='svc__shrinking', choices=[True, False], default_value=True)
+        name='shrinking', choices=[True, False], default_value=True)
     tol = ConfigSpace.UniformFloatHyperparameter(
-        name='svc__tol', lower=1e-5, upper=1e-1, default_value=1e-3, log=True)
-    max_iter = ConfigSpace.UnParametrizedHyperparameter('svc__max_iter', -1)
+        name='tol', lower=1e-5, upper=1e-1, default_value=1e-3, log=True)
+    max_iter = ConfigSpace.UnParametrizedHyperparameter('max_iter', -1)
 
-    cs.add_hyperparameters([
-        imputation,
+    hyperparameters = [
         C,
         kernel,
         degree,
@@ -47,11 +46,10 @@ def get_hyperparameter_search_space(seed):
         shrinking,
         tol,
         max_iter
-    ])
+    ]
 
     degree_depends_on_poly = ConfigSpace.EqualsCondition(degree, kernel, 'poly')
     coef0_condition = ConfigSpace.InCondition(coef0, kernel, ['poly', 'sigmoid'])
-    cs.add_condition(degree_depends_on_poly)
-    cs.add_condition(coef0_condition)
+    conditions = [degree_depends_on_poly, coef0_condition]
 
-    return cs
+    return ConfigSpaceWrapper(cs, hyperparameters, conditions)

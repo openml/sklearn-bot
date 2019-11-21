@@ -16,6 +16,7 @@ def parse_args():
     parser = argparse.ArgumentParser(description='Generate data for openml-pimp project')
     parser.add_argument('--output_directory', type=str, default=os.path.expanduser('~') + '/experiments/sklearn-bot',
                         help='directory to store output')
+    parser.add_argument('--extension', type=str, choices=['arff', 'csv'], default='csv')
     parser.add_argument('--num_runs', type=int, default=500, help='max results per task to obtain, to limit time')
     parser.add_argument('--study_id', type=str, default=14, help='the tag to obtain the tasks from')
     parser.add_argument('--scoring', type=str, nargs='+', default=['predictive_accuracy'],
@@ -32,7 +33,9 @@ def parse_args():
     parser.add_argument('--openml_server', type=str, default=None, help='the openml server location')
     parser.add_argument('--classifier_name', type=str, choices=all_classifiers, default='decision_tree',
                         help='the classifier to run')
-    parser.add_argument('--flow_id', type=int, default=6970,
+    parser.add_argument('--vanilla_estimator', action='store_true',
+                        help='if set, run vanilla classifiers rather than a pipeline')
+    parser.add_argument('--flow_id', type=int, default=None,
                         help='if known, the flow id of the classifier (can be induced)')
     args_ = parser.parse_args()
     return args_
@@ -50,15 +53,23 @@ def run():
     root.setLevel(logging.INFO)
 
     logging.info('started obtain results script with parameters %s' % str(args))
-    study = openml.study.get_study(args.study_id, 'tasks')
+    study = openml.study.get_suite(args.study_id)
     logging.info('obtained study %s with %d tasks' % (args.study_id, len(study.tasks)))
 
     # acquire config space
-    config_space = sklearnbot.config_spaces.get_config_space(args.classifier_name, None)
+    configuration_space_wrapper = sklearnbot.config_spaces.get_config_space(args.classifier_name, None)
+    if not args.vanilla_estimator:
+        configuration_space_wrapper.wrap_in_fixed_pipeline()
+    config_space = configuration_space_wrapper.assemble()
     # acquire classifier and flow, for flow id
-    clf = sklearnbot.sklearn.as_estimator(config_space, [], [])
+    if configuration_space_wrapper.wrapped_in_pipeline:
+        clf = sklearnbot.sklearn.as_pipeline(config_space, [], [])
+    else:
+        clf = sklearnbot.sklearn.as_estimator(config_space, False)
+
     if args.flow_id is None:
-        flow = openml.flows.sklearn_to_flow(clf)
+        openml_extension = openml.extensions.get_extension_by_model(clf)
+        flow = openml_extension.model_to_flow(clf)
         flow_id = openml.flows.flow_exists(flow.name, flow.external_version)
     else:
         flow_id = args.flow_id
@@ -98,8 +109,8 @@ def run():
     os.makedirs(output_directory, exist_ok=True)
     # create the task / parameters / performance arff
     filename = os.path.join(output_directory,
-                            'results__%d__%s__%s.arff' % (args.num_runs, args.classifier_name,
-                                                          '__'.join(args.scoring)))
+                            'results__%d__%s__%s.%s' % (args.num_runs, args.classifier_name,
+                                                        '__'.join(args.scoring), args.extension))
     relation_name = 'openml-meta-flow-%d' % flow_id
     json_meta = {
         'flow_id': flow_id,
@@ -111,9 +122,14 @@ def run():
         'max_runs_per_task': args.num_runs
     }
     with open(filename, 'w') as fp:
-        arff.dump(openmlcontrib.meta.dataframe_to_arff(performance_data,
-                                                       relation_name,
-                                                       json.dumps(json_meta)), fp)
+        if args.extension == 'arff':
+            arff.dump(openmlcontrib.meta.dataframe_to_arff(performance_data,
+                                                           relation_name,
+                                                           json.dumps(json_meta)), fp)
+        elif args.extension == 'csv':
+            performance_data.to_csv(fp, index=False)
+        else:
+            raise ValueError()
     logging.info('Stored performance results as ARFF file with vanilla results to %s ' % filename)
 
     if args.meta_features:
@@ -125,9 +141,14 @@ def run():
                                 'metafeatures__%d__%s__%s.arff' % (args.num_runs, args.classifier_name,
                                                                    '__'.join(args.scoring)))
         with open(filename, 'w') as fp:
-            arff.dump(openmlcontrib.meta.dataframe_to_arff(setup_data_with_meta_features,
-                                                           relation_name,
-                                                           json.dumps(json_meta)), fp)
+            if args.extension == 'arff':
+                arff.dump(openmlcontrib.meta.dataframe_to_arff(setup_data_with_meta_features,
+                                                               relation_name,
+                                                               json.dumps(json_meta)), fp)
+            elif args.extension == 'csv':
+                setup_data_with_meta_features.to_csv(fp, index=False)
+            else:
+                raise ValueError()
         logging.info('Stored meta-features and results as ARFF file with vanilla results to %s' % filename)
 
 
