@@ -23,6 +23,8 @@ def parse_args():
     parser.add_argument('--upload_result', action='store_true',
                         help='if true, results will be immediately uploaded to OpenML.'
                              'Otherwise they will be stored on disk. ')
+    parser.add_argument('--run_defaults', action='store_true',
+                        help='if true, will run default configuration')
 
     return parser.parse_args()
 
@@ -48,7 +50,7 @@ def run():
     for i in range(args.n_executions):
         success, run_id, folder = sklearnbot.bot.run_bot_on_task(args.task_id,
                                                                  configuration_space_wrapper,
-                                                                 False,
+                                                                 args.run_defaults,
                                                                  output_dir,
                                                                  args.upload_result)
         if success:
