@@ -13,6 +13,7 @@ from sklearnbot.config_spaces import ConfigSpaceWrapper
 
 def run_bot_on_task(task_id: int,
                     configuration_space_wrapper: ConfigSpaceWrapper,
+                    run_defaults: bool,
                     output_dir: str,
                     upload_and_delete: bool) \
         -> typing.Tuple[bool, typing.Optional[int], typing.Optional[str]]:
@@ -23,6 +24,9 @@ def run_bot_on_task(task_id: int,
     ----------
     task_id: int
         The OpenML task id to run the bot on
+
+    run_defaults: bool
+        If set to true, the configuration will be run with its default hyperparameter values
 
     configuration_space_wrapper: ConfigSpace.ConfigurationSpace
         The config space wrapper, that can be assembled to a config space, from which random configurations will be
@@ -69,9 +73,12 @@ def run_bot_on_task(task_id: int,
             classifier = sklearnbot.sklearn.as_estimator(configuration_space, False)
 
         # sample configuration and set hyperparameters
-        configuration = configuration_space.sample_configuration(1)
-        logging.info('Configuration: %s' % configuration.get_dictionary())
-        classifier.set_params(**configuration.get_dictionary())
+        if not run_defaults:
+            configuration = configuration_space.sample_configuration(1)
+            logging.info('Configuration: %s' % configuration.get_dictionary())
+            classifier.set_params(**configuration.get_dictionary())
+        else:
+            logging.info('Running default configuration')
 
         # invoke OpenML run
         run = openml.runs.run_model_on_task(classifier, task)

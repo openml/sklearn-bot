@@ -48,6 +48,7 @@ def run():
     for i in range(args.n_executions):
         success, run_id, folder = sklearnbot.bot.run_bot_on_task(args.task_id,
                                                                  configuration_space_wrapper,
+                                                                 False,
                                                                  output_dir,
                                                                  args.upload_result)
         if success:
