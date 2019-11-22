@@ -22,7 +22,7 @@ def get_hyperparameter_search_space(seed) -> ConfigSpaceWrapper:
     """
     cs = ConfigSpace.ConfigurationSpace('sklearn.ensemble.AdaBoostClassifier',
                                         seed,
-                                        meta={"base_estimator": DecisionTreeClassifier()})
+                                        meta={"base_estimator": DecisionTreeClassifier(random_state=0)})
 
     n_estimators = ConfigSpace.hyperparameters.UniformIntegerHyperparameter(
         name="n_estimators", lower=50, upper=500, default_value=50, log=False)
