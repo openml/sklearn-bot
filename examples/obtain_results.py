@@ -2,7 +2,6 @@ import arff
 import argparse
 import json
 import logging
-import numpy as np
 import openml
 import openmlcontrib
 import os

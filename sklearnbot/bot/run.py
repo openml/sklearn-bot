@@ -11,6 +11,33 @@ import uuid
 from sklearnbot.config_spaces import ConfigSpaceWrapper
 
 
+def prepare_classifier(configuration_space_wrapper: ConfigSpaceWrapper, task: openml.tasks.OpenMLTask,
+                       run_defaults: bool):
+    configuration_space = configuration_space_wrapper.assemble()
+
+    data_name = task.get_dataset().name
+    data_qualities = task.get_dataset().qualities
+    data_tuple = (task.task_id, data_name, data_qualities['NumberOfFeatures'], data_qualities['NumberOfInstances'])
+    logging.info('Obtained task %d (%s); %s attributes; %s observations' % data_tuple)
+
+    # obtain deserialized classifier
+    nominal_indices = task.get_dataset().get_features_by_type('nominal', [task.target_name])
+    numeric_indices = task.get_dataset().get_features_by_type('numeric', [task.target_name])
+    if configuration_space_wrapper.wrapped_in_pipeline:
+        classifier = sklearnbot.sklearn.as_pipeline(configuration_space, numeric_indices, nominal_indices)
+    else:
+        classifier = sklearnbot.sklearn.as_estimator(configuration_space, False)
+
+    # sample configuration and set hyperparameters
+    if not run_defaults:
+        configuration = configuration_space.sample_configuration(1)
+        logging.info('Configuration: %s' % configuration.get_dictionary())
+        classifier.set_params(**configuration.get_dictionary())
+    else:
+        logging.info('Running default configuration')
+    return classifier
+
+
 def run_bot_on_task(task_id: int,
                     configuration_space_wrapper: ConfigSpaceWrapper,
                     run_defaults: bool,
@@ -54,37 +81,18 @@ def run_bot_on_task(task_id: int,
         If the run was executed successfully and the folder was not deleted,
         the path to the folder. None otherwise
     """
-    configuration_space = configuration_space_wrapper.assemble()
-    local_run_dir = None
+    local_run_dir = os.path.join(output_dir, str(task_id), str(uuid.uuid4()))
     try:
         # obtain task
         task = openml.tasks.get_task(task_id)
-        data_name = task.get_dataset().name
-        data_qualities = task.get_dataset().qualities
-        data_tuple = (task.task_id, data_name, data_qualities['NumberOfFeatures'], data_qualities['NumberOfInstances'])
-        logging.info('Obtained task %d (%s); %s attributes; %s observations' % data_tuple)
 
-        # obtain deserialized classifier
-        nominal_indices = task.get_dataset().get_features_by_type('nominal', [task.target_name])
-        numeric_indices = task.get_dataset().get_features_by_type('numeric', [task.target_name])
-        if configuration_space_wrapper.wrapped_in_pipeline:
-            classifier = sklearnbot.sklearn.as_pipeline(configuration_space, numeric_indices, nominal_indices)
-        else:
-            classifier = sklearnbot.sklearn.as_estimator(configuration_space, False)
-
-        # sample configuration and set hyperparameters
-        if not run_defaults:
-            configuration = configuration_space.sample_configuration(1)
-            logging.info('Configuration: %s' % configuration.get_dictionary())
-            classifier.set_params(**configuration.get_dictionary())
-        else:
-            logging.info('Running default configuration')
+        # obtain prepared classifier
+        classifier = prepare_classifier(configuration_space_wrapper, task, run_defaults)
 
         # invoke OpenML run
         run = openml.runs.run_model_on_task(classifier, task)
         score = run.get_metric_fn(sklearn.metrics.accuracy_score)
         logging.info('Task %d - %s; Accuracy: %0.2f' % (task_id, task.get_dataset().name, score.mean()))
-        local_run_dir = os.path.join(output_dir, str(task_id), str(uuid.uuid4()))
         run.to_filesystem(local_run_dir, store_model=False)
         if upload_and_delete:
             run = run.publish()
