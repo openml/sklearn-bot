@@ -37,7 +37,7 @@ def run():
     if not args.vanilla_estimator:
         configuration_space_wrapper.wrap_in_fixed_pipeline()
 
-    setup_ids = {}
+    setup_ids = set()
     for task_id in tasks:
         task = openml.tasks.get_task(task_id)
         classifier = sklearnbot.bot.prepare_classifier(configuration_space_wrapper, task, True)
@@ -57,6 +57,7 @@ def run():
             else:
                 logging.info('Task %d: Setup id %d' % (task_id, setup_id))
                 setup_ids.add(setup_id)
+                print(setup_ids)
         except openml.exceptions.OpenMLServerException:
             pass
     print(setup_ids)
