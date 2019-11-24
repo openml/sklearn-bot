@@ -1,5 +1,6 @@
 import ConfigSpace
 import importlib
+import openml
 import scipy.stats
 import sklearn
 import sklearn.compose
@@ -48,6 +49,15 @@ def _config_space_to_parameter_distributions(
     return result
 
 
+def _seed_models(model):
+    rs_params = dict()
+    for param, value in model.get_params(deep=True).items():
+        if param.endswith('random_state') and value is None:
+            rs_params[param] = 0
+    model.set_params(**rs_params)
+    return model
+
+
 def as_estimator(configuration_space: ConfigSpace.ConfigurationSpace, skip_meta: bool):
     """
     Takes a ConfigSpace object and deserializes it back to an appropriate
@@ -73,8 +83,7 @@ def as_estimator(configuration_space: ConfigSpace.ConfigurationSpace, skip_meta:
     clf = getattr(importlib.import_module(module_name[0]), module_name[1])()
     if not skip_meta and configuration_space.meta is not None:
         clf.set_params(**configuration_space.meta)
-    if 'random_state' in clf.get_params().keys():
-        clf.set_params(random_state=0)
+    clf = _seed_models(clf)
     return clf
 
 
@@ -121,7 +130,7 @@ def as_pipeline(configuration_space: ConfigSpace.ConfigurationSpace,
             ('nominal', categorical_transformer, nominal_indices)],
         remainder='passthrough')
 
-    clf = as_estimator(configuration_space, True)
+    clf = as_estimator(configuration_space, True)  # supposed to set random_state
     pipeline = sklearn.pipeline.make_pipeline(transformer,
                                               sklearn.feature_selection.VarianceThreshold(),
                                               clf)

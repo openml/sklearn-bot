@@ -36,6 +36,11 @@ class ConfigSpaceWrapper(object):
         clf_name = self.config_space.name.rsplit('.', 1)[-1]
         for hyperparameter in self.hyperparameters:
             hyperparameter.name = '%s__%s' % (clf_name.lower(), hyperparameter.name)
+        if self.config_space.meta is not None:
+            meta_new = {
+                '%s__%s' % (clf_name.lower(), n): v for n, v in self.config_space.meta.items()
+            }
+            self.config_space.meta = meta_new
 
         imputation = ConfigSpace.hyperparameters.CategoricalHyperparameter(
             name='columntransformer__numeric__imputer__strategy', choices=['mean', 'median', 'most_frequent'])

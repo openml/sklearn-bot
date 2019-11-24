@@ -24,6 +24,10 @@ def parse_args():
     parser.add_argument('--upload_result', action='store_true',
                         help='if true, results will be immediately uploaded to OpenML.'
                              'Otherwise they will be stored on disk. ')
+    parser.add_argument('--random_tasks', action='store_true',
+                        help='if true, will take a random task every round. Otherwise, iterates tasks in round-robin ')
+    parser.add_argument('--run_defaults', action='store_true',
+                        help='if true, will run default configuration')
 
     return parser.parse_args()
 
@@ -48,9 +52,13 @@ def run():
     output_dir = os.path.join(args.output_dir, args.classifier_name)
 
     for i in range(args.n_executions):
-        task_id = random.choice(tasks)
+        if args.random_tasks:
+            task_id = random.choice(tasks)
+        else:
+            task_id = tasks[i % len(tasks)]
         success, run_id, folder = sklearnbot.bot.run_bot_on_task(task_id,
                                                                  configuration_space_wrapper,
+                                                                 args.run_defaults,
                                                                  output_dir,
                                                                  args.upload_result)
         if success:
