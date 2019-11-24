@@ -62,7 +62,7 @@ def run():
     else:
         openml.config.server = 'https://www.openml.org/api/v1/'
     tasks = openml.study.get_suite(args.study_id).tasks
-    os.makedirs(args.output_directory)
+    os.makedirs(args.output_directory, exist_ok=True)
 
     memory = joblib.memory.Memory(os.path.join(args.output_directory, '.cache'), verbose=0)
     get_setup_ids_cached = memory.cache(get_setup_ids)
