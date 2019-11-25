@@ -21,7 +21,7 @@ def parse_args():
     return parser.parse_args()
 
 
-def get_setup_ids(tasks: typing.List[int], classifier_name: str):
+def get_setup_ids(tasks: typing.List[int], classifier_name: str) -> typing.Set[int]:
     configuration_space_wrapper = sklearnbot.config_spaces.get_config_space(classifier_name, None)
     configuration_space_wrapper.wrap_in_fixed_pipeline()
 
@@ -75,7 +75,7 @@ def run():
     for classifier in classifiers:
         setup_ids = get_setup_ids_cached(tasks, classifier)
         logging.info('%s: %s' % (classifier, setup_ids))
-        run_frame = openml.runs.list_runs(task=tasks, setup=setup_ids, output_format='dataframe')
+        run_frame = openml.runs.list_runs(task=tasks, setup=list(setup_ids), output_format='dataframe')
         if len(results) == 0:
             results = run_frame
         else:
