@@ -79,7 +79,7 @@ def run():
         if len(results) == 0:
             results = run_frame
         else:
-            results.append(run_frame)
+            results = results.append(run_frame)
     result_file = os.path.join(args.output_directory, 'run_results_%s.csv' % args.classifier_name)
     results.to_csv(result_file)
     logging.info('stored result to: %s' % result_file)
