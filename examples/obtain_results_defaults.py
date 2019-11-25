@@ -74,7 +74,7 @@ def run():
     results = pd.DataFrame()
     for idx, classifier in enumerate(classifiers):
         setup_ids = get_setup_ids_cached(tasks, classifier)
-        logging.info('(%d/%d) %s: %s' % (idx+1, len(classifiers), classifier, setup_ids))
+        logging.info('(%d/%d) %s: %s (%d)' % (idx+1, len(classifiers), classifier, setup_ids, len(setup_ids)))
         run_frame = openml.runs.list_runs(task=tasks, setup=list(setup_ids), output_format='dataframe')
         if len(results) == 0:
             results = run_frame
