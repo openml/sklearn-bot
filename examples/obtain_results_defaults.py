@@ -11,10 +11,11 @@ import typing
 # sshfs fr_jv1031@login1.nemo.uni-freiburg.de:/home/fr/fr_fr/fr_jv1031/experiments ~/nemo_experiments
 def parse_args():
     all_classifiers = sklearnbot.config_spaces.get_available_config_spaces(True)
-    parser = argparse.ArgumentParser(description='Generate data for openml-pimp project')
+    parser = argparse.ArgumentParser()
     parser.add_argument('--study_id', type=str, default='OpenML-CC18', help='the tag to obtain the tasks from')
     parser.add_argument('--openml_server', type=str, default=None, help='the openml server location')
     parser.add_argument('--openml_apikey', type=str, default=None, help='the apikey to authenticate to OpenML')
+    parser.add_argument('--evaluation_measure', type=str, default=None)
     parser.add_argument('--classifier_name', type=str, choices=all_classifiers, default='adaboost',
                         help='the classifier to run')
     parser.add_argument('--output_directory', type=str, default=os.path.expanduser('~/experiments/sklearn-bot'))
@@ -75,12 +76,17 @@ def run():
     for idx, classifier in enumerate(classifiers):
         setup_ids = get_setup_ids_cached(tasks, classifier)
         logging.info('(%d/%d) %s: %s (%d)' % (idx+1, len(classifiers), classifier, setup_ids, len(setup_ids)))
-        run_frame = openml.runs.list_runs(task=tasks, setup=list(setup_ids), output_format='dataframe')
-        if len(results) == 0:
-            results = run_frame
+        if args.evaluation_measure is None:
+            result_frame = openml.runs.list_runs(task=tasks, setup=list(setup_ids), output_format='dataframe')
         else:
-            results = results.append(run_frame)
-    result_file = os.path.join(args.output_directory, 'run_results_%s.csv' % args.classifier_name)
+            result_frame = openml.evaluations.list_evaluations(
+                function=args.evaluation_measure, task=tasks, setup=list(setup_ids), output_format='dataframe')
+        if len(results) == 0:
+            results = result_frame
+        else:
+            results = results.append(result_frame)
+    suffix = 'runs' if args.evaluation_measure is None else args.evaluation_measure
+    result_file = os.path.join(args.output_directory, 'results_%s_%s.csv' % (args.classifier_name, suffix))
     results.to_csv(result_file)
     logging.info('stored result to: %s' % result_file)
 
