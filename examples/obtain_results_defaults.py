@@ -27,7 +27,8 @@ def get_setup_ids(tasks: typing.List[int], classifier_name: str) -> typing.Set[i
     configuration_space_wrapper.wrap_in_fixed_pipeline()
 
     setup_ids = set()
-    for task_id in tasks:
+    for idx, task_id in enumerate(tasks):
+        logging.info('(%d/%d) Getting task %d' % (idx+1, len(tasks), task_id))
         task = openml.tasks.get_task(task_id)
         classifier = sklearnbot.bot.prepare_classifier(configuration_space_wrapper, task, True)
         extension = openml.extensions.get_extension_by_model(classifier)
