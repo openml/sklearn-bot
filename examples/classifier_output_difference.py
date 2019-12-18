@@ -24,7 +24,7 @@ def parse_args():
 def flow_name_neat(name):
     if name.strip()[-2:] == '))':
         name_splitted = name.split('(')
-        return name_splitted[-2].split('.')[-1].split('(')[0] + '(' + name_splitted[-1].split('.')[-1] + ')'
+        return name_splitted[-2].split('.')[-1].split('(')[0] + '(' + name_splitted[-1].split('.')[-1].replace(')', '') + ')'
     else:
         return name.split('.')[-1].replace(')', '')
 
@@ -33,10 +33,11 @@ def plot(df_results: np.array, labels: typing.List[str], output_file: str):
     fig, ax = plt.subplots(figsize=(8, 6))
     scipy.cluster.hierarchy.dendrogram(
         scipy.cluster.hierarchy.linkage(scipy.spatial.distance.squareform(df_results), "single"),
-        ax=ax, orientation='top', labels=np.array(labels))
+        ax=ax, orientation='top', labels=np.array(labels), color_threshold=-1, above_threshold_color='#000000')
     ax.set_xticklabels(ax.get_xticklabels(), rotation=45, ha='right')
     plt.tight_layout()
     plt.savefig(output_file)
+    plt.close()
     logging.info('Saved to %s' % output_file)
 
 
@@ -95,7 +96,7 @@ def run():
         plot(df_results.values, labels, output_file)
 
     output_file = os.path.join(args.output_directory, 'all.%s' % args.extension)
-    plot(result, labels, output_file)
+    plot(result / len(df_runids), labels, output_file)
 
 
 if __name__ == '__main__':

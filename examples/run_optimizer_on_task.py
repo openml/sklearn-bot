@@ -9,9 +9,9 @@ import sklearnbot
 def parse_args():
     all_classifiers = sklearnbot.config_spaces.get_available_config_spaces(True)
     parser = argparse.ArgumentParser(description='Generate data for openml-pimp project')
-    parser.add_argument('--task_id', type=int, default=None, help='the openml task id')
-    parser.add_argument('--openml_server', type=str, default=None, help='the openml server location')
-    parser.add_argument('--openml_apikey', type=str, default=None, help='the apikey to authenticate to OpenML')
+    parser.add_argument('--task_id', type=int, default=3, help='the openml task id')
+    parser.add_argument('--openml_server', type=str, default='https://www.openml.org/api/v1/', help='the openml server location')
+    parser.add_argument('--openml_apikey', type=str, default='48830dd663e41d5cb689016a072e6ec1', help='the apikey to authenticate to OpenML')
     parser.add_argument('--classifier_name', type=str, choices=all_classifiers, default='decision_tree',
                         help='the classifier to run')
     default_output_dir = os.path.join(os.path.expanduser('~'), 'experiments/sklearn-bot')
@@ -37,21 +37,18 @@ def run():
         openml.config.server = 'https://test.openml.org/api/v1/'
 
     configuration_space_wrapper = sklearnbot.config_spaces.get_config_space(args.classifier_name, None)
-    if not args.vanilla_estimator:
-        configuration_space_wrapper.wrap_in_fixed_pipeline()
+    configuration_space_wrapper.wrap_in_fixed_pipeline()
 
     output_dir = os.path.join(args.output_dir, args.classifier_name)
 
-    for i in range(args.n_executions):
-        success, run_id, folder = sklearnbot.bot.run_optimizer_on_task(args.task_id,
-                                                                       configuration_space_wrapper,
-                                                                       args.run_defaults,
-                                                                       output_dir,
-                                                                       args.upload_result)
-        if success:
-            logging.info('Run was executed successfully. Run id=%s; folder=%s' % (run_id, folder))
-        else:
-            logging.warning('A problem occurred. Run id=%s; folder=%s' % (run_id, folder))
+    success, run_id, folder = sklearnbot.bot.run_optimizer_on_task(args.task_id,
+                                                                   configuration_space_wrapper,
+                                                                   output_dir,
+                                                                   args.upload_result)
+    if success:
+        logging.info('Run was executed successfully. Run id=%s; folder=%s' % (run_id, folder))
+    else:
+        logging.warning('A problem occurred. Run id=%s; folder=%s' % (run_id, folder))
 
 
 if __name__ == '__main__':

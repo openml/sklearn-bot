@@ -107,10 +107,8 @@ def run_bot_on_task(task_id: int,
         return False, None, local_run_dir
 
 
-
 def run_optimizer_on_task(task_id: int,
                           configuration_space_wrapper: ConfigSpaceWrapper,
-                          run_defaults: bool,
                           output_dir: str,
                           upload_and_delete: bool) \
         -> typing.Tuple[bool, typing.Optional[int], typing.Optional[str]]:
