@@ -10,8 +10,8 @@ def parse_args():
     all_classifiers = sklearnbot.config_spaces.get_available_config_spaces(True)
     parser = argparse.ArgumentParser(description='Generate data for openml-pimp project')
     parser.add_argument('--task_id', type=int, default=3, help='the openml task id')
-    parser.add_argument('--openml_server', type=str, default='https://www.openml.org/api/v1/', help='the openml server location')
-    parser.add_argument('--openml_apikey', type=str, default='48830dd663e41d5cb689016a072e6ec1', help='the apikey to authenticate to OpenML')
+    parser.add_argument('--openml_server', type=str, default=None, help='the openml server location')
+    parser.add_argument('--openml_apikey', type=str, default=None, help='the apikey to authenticate to OpenML')
     parser.add_argument('--classifier_name', type=str, choices=all_classifiers, default='decision_tree',
                         help='the classifier to run')
     default_output_dir = os.path.join(os.path.expanduser('~'), 'experiments/sklearn-bot')
