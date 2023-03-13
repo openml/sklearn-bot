@@ -42,8 +42,4 @@ class ConfigSpaceWrapper(object):
             }
             self.config_space.meta = meta_new
 
-        imputation = ConfigSpace.hyperparameters.CategoricalHyperparameter(
-            name='columntransformer__numeric__imputer__strategy', choices=['mean', 'median', 'most_frequent'])
-        self.config_space.add_hyperparameter(imputation)
-
         self.wrapped_in_pipeline = True

@@ -25,6 +25,8 @@ def parse_args():
                              'Otherwise they will be stored on disk. ')
     parser.add_argument('--run_defaults', action='store_true',
                         help='if true, will run default configuration')
+    parser.add_argument('--config_space_random_state', type=int,  default=0,
+                        help='random state for config space')
 
     return parser.parse_args()
 
@@ -41,13 +43,15 @@ def run():
     else:
         openml.config.server = 'https://test.openml.org/api/v1/'
 
-    configuration_space_wrapper = sklearnbot.config_spaces.get_config_space(args.classifier_name, None)
-    if not args.vanilla_estimator:
-        configuration_space_wrapper.wrap_in_fixed_pipeline()
-
     output_dir = os.path.join(args.output_dir, args.classifier_name)
 
     for i in range(args.n_executions):
+        # note that the config space random state is reset every round.
+        # therefore, we utilize the iterator of the range for this
+        configuration_space_wrapper = sklearnbot.config_spaces.get_config_space(args.classifier_name,
+                                                                                args.config_space_random_state + i)
+        if not args.vanilla_estimator:
+            configuration_space_wrapper.wrap_in_fixed_pipeline()
         success, run_id, folder = sklearnbot.bot.run_bot_on_task(args.task_id,
                                                                  configuration_space_wrapper,
                                                                  args.run_defaults,

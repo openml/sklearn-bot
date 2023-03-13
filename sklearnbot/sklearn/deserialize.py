@@ -1,6 +1,5 @@
 import ConfigSpace
 import importlib
-import openml
 import scipy.stats
 import sklearn
 import sklearn.compose
@@ -114,26 +113,19 @@ def as_pipeline(configuration_space: ConfigSpace.ConfigurationSpace,
     clf: sklearn.BaseEstimator
         The instantiated classifier with default hyperparameters
     """
-    numeric_transformer = sklearn.pipeline.make_pipeline(
-        sklearn.preprocessing.Imputer(),
-        sklearn.preprocessing.StandardScaler())
-
-    # note that the dataset is encoded numerically, hence we can only impute
-    # numeric values, even for the categorical columns. 
-    categorical_transformer = sklearn.pipeline.make_pipeline(
-        sklearn.impute.SimpleImputer(strategy='constant', fill_value=-1),
-        sklearn.preprocessing.OneHotEncoder(handle_unknown='ignore'))
 
     transformer = sklearn.compose.ColumnTransformer(
         transformers=[
-            ('numeric', numeric_transformer, numeric_indices),
-            ('nominal', categorical_transformer, nominal_indices)],
+            ('numeric', sklearn.preprocessing.StandardScaler(), numeric_indices),
+            ('nominal', sklearn.preprocessing.OneHotEncoder(handle_unknown='ignore'), nominal_indices)],
         remainder='passthrough')
 
     clf = as_estimator(configuration_space, True)  # supposed to set random_state
-    pipeline = sklearn.pipeline.make_pipeline(transformer,
-                                              sklearn.feature_selection.VarianceThreshold(),
-                                              clf)
+    pipeline = sklearn.pipeline.make_pipeline(
+        sklearn.impute.SimpleImputer(strategy='constant', fill_value=-1),
+        transformer,
+        sklearn.feature_selection.VarianceThreshold(),
+        clf)
     if configuration_space.meta is not None:
         pipeline.set_params(**configuration_space.meta)
     return pipeline
