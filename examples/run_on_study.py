@@ -28,6 +28,10 @@ def parse_args():
                         help='if true, will take a random task every round. Otherwise, iterates tasks in round-robin ')
     parser.add_argument('--run_defaults', action='store_true',
                         help='if true, will run default configuration')
+    parser.add_argument('--config_space_random_state', type=int,
+                        help='random state for config space')
+    parser.add_argument('--run_tag', type=str, 
+                        help='Tag to add to the runs')
 
     return parser.parse_args()
 
@@ -45,10 +49,6 @@ def run():
         openml.config.server = 'https://test.openml.org/api/v1/'
     tasks = openml.study.get_suite(args.study_id).tasks
 
-    configuration_space_wrapper = sklearnbot.config_spaces.get_config_space(args.classifier_name, None)
-    if not args.vanilla_estimator:
-        configuration_space_wrapper.wrap_in_fixed_pipeline()
-
     output_dir = os.path.join(args.output_dir, args.classifier_name)
 
     for i in range(args.n_executions):
@@ -56,11 +56,17 @@ def run():
             task_id = random.choice(tasks)
         else:
             task_id = tasks[i % len(tasks)]
+        configuration_space_wrapper = sklearnbot.config_spaces.get_config_space(args.classifier_name,
+                                                                                args.config_space_random_state + i)
+        if not args.vanilla_estimator:
+            configuration_space_wrapper.wrap_in_fixed_pipeline()
+
         success, run_id, folder = sklearnbot.bot.run_bot_on_task(task_id,
                                                                  configuration_space_wrapper,
                                                                  args.run_defaults,
                                                                  output_dir,
-                                                                 args.upload_result)
+                                                                 args.upload_result,
+                                                                 args.run_tag)
         if success:
             logging.info('Run was executed successfully. Run id=%s; folder=%s' % (run_id, folder))
         else:
