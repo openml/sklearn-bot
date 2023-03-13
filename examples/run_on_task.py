@@ -27,6 +27,8 @@ def parse_args():
                         help='if true, will run default configuration')
     parser.add_argument('--config_space_random_state', type=int,  default=0,
                         help='random state for config space')
+    parser.add_argument('--run_tag', type=str,
+                        help='Tag to add to the runs')
 
     return parser.parse_args()
 
@@ -56,7 +58,8 @@ def run():
                                                                  configuration_space_wrapper,
                                                                  args.run_defaults,
                                                                  output_dir,
-                                                                 args.upload_result)
+                                                                 args.upload_result,
+                                                                 args.run_tag)
         if success:
             logging.info('Run was executed successfully. Run id=%s; folder=%s' % (run_id, folder))
         else:

@@ -42,7 +42,8 @@ def run_bot_on_task(task_id: int,
                     configuration_space_wrapper: ConfigSpaceWrapper,
                     run_defaults: bool,
                     output_dir: str,
-                    upload_and_delete: bool) \
+                    upload_and_delete: bool,
+                    tag: typing.Optional[str]=None) \
         -> typing.Tuple[bool, typing.Optional[int], typing.Optional[str]]:
     """
     Runs the bot with a random configuration on an OpenML task
@@ -66,6 +67,9 @@ def run_bot_on_task(task_id: int,
     upload_and_delete: bool
         If true, after the run has been executed it will be uploaded to OpenML.
         If the uploading is correct, the local files will be deleted afterwards.
+
+    tag: str
+        Only relevant when upload_and_delete is set to True. Adds the provided string as tag to the uploaded runs
 
     Returns
     -------
@@ -98,6 +102,9 @@ def run_bot_on_task(task_id: int,
             run = run.publish()
             shutil.rmtree(local_run_dir)
             local_run_dir = None
+            if tag is not None:
+                run.push_tag(tag)
+
         return True, run.run_id, local_run_dir
     except openml.exceptions.OpenMLServerException:
         traceback.print_exc()
